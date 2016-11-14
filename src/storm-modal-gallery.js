@@ -14,13 +14,13 @@ const defaults = {
 				</svg>`
 	},
 	fullScreen: false,
-	async: false,
-	preload: 2
+	async: false
 };
 
 const StormModalGallery = {
 	init() {
 		this.initOverlay();
+		this.imageCache = [];
 		return this;
 	},
 	initOverlay(){
@@ -50,6 +50,11 @@ const StormModalGallery = {
 			this.close();
 		});
 
+	},
+	preloadImage(src) {
+		let img = new Image();
+		img.src = src;
+		this.imageCache.push(img);
 	},
 	open(){},
 	previous(){},
