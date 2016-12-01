@@ -1,12 +1,12 @@
 const defaults = {
 	templates: {
-		leftArrow: `<svg class="js-modal-gallery__previous" role="button" width="44" height="60">
+		previous: `<svg width="44" height="60">
 						<polyline points="30 10 10 30 30 50" stroke="rgba(255,255,255,0.5)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>
 					</svg>`,
-		rightArrow: `<svg class="js-modal-gallery__next" role="button" width="44" height="60">
+		right: `<svg role="button" width="44" height="60">
 						<polyline points="14 10 34 30 14 50" stroke="rgba(255,255,255,0.5)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>
 					</svg>`,
-		close: `<svg class="js-modal-gallery__close" role="button" width="30" height="30">
+		close: `<svg role="button" width="30" height="30">
 					<g stroke="rgb(160,160,160)" stroke-width="4">
 						<line x1="5" y1="5" x2="25" y2="25"/>
 						<line x1="5" y1="25" x2="25" y2="5"/>
@@ -23,14 +23,41 @@ const StormModalGallery = {
 		this.imageCache = [];
 		return this;
 	},
+	createNode(type = 'div', classList = '', attributeList = {}){
+		let node = document.createElement(type);
+
+		for(let attribute in attributeList) {
+			if(attributeList.hasOwnProperty(attribute)) node.setAttribute(attribute, attributeList[attribute]);
+		}
+		node.classList = classList
+		return node;
+	},
 	initOverlay(){
-		let overlayTemplate = `<div class="modal-gallery__outer" role="dialog" tabindex="-1">
+		this.overlay = {};
+		this.overlay.container = createNode('div', 'modal-gallery__outer', {
+			role: 'dialog',
+			tabindex: '-1'
+		});
+		this.overlay.inner = createNode('div', 'modal-gallery__inner');
+		this.overlay.buttonPrevious = createNode('button', 'modal-gallery__previous');
+		this.overlay.buttonPrevious.innerHTML = this.settings.templates.previous;
+		this.overlay.buttonNext = createNode('button', 'modal-gallery__next');
+		this.overlay.buttonNext.innerHTML = this.settings.templates.next;
+		this.overlay.buttonClose = createNode('button', 'modal-gallery__close');
+		this.overlay.buttonClose.innerHTML = this.settings.templates.close;
+
+		this.overlay.container.appendChild(this.overlay.inner);
+		this.overlay.container.appendChild(this.overlay.buttonPrevious);
+		this.overlay.container.appendChild(this.overlay.buttonNext);
+
+		/*
+		let overlayTemplate = `<div class="" >
 									<div class="modal-gallery__inner"></div>
 									${this.settings.templates.leftArrow}
 									${this.settings.templates.rightArrow}
 									${this.settings.templates.close}
 								</div>`;
-
+								*/
 		document.body.insertAdjacentHTML('beforeend', overlayTemplate);
 	},
 	initButtons(){

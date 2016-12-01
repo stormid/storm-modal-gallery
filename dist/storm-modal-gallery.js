@@ -1,6 +1,6 @@
 /**
  * @name storm-modal-gallery: Modal gallery/lightbox
- * @version 0.1.0: Mon, 14 Nov 2016 18:07:41 GMT
+ * @version 0.1.0: Thu, 01 Dec 2016 21:51:43 GMT
  * @author mjbp
  * @license MIT
  */
@@ -20,13 +20,13 @@ const defaults = {
 				</svg>`
 	},
 	fullScreen: false,
-	async: false,
-	preload: 2
+	async: false
 };
 
 const StormModalGallery = {
 	init() {
 		this.initOverlay();
+		this.imageCache = [];
 		return this;
 	},
 	initOverlay(){
@@ -40,9 +40,31 @@ const StormModalGallery = {
 		document.body.insertAdjacentHTML('beforeend', overlayTemplate);
 	},
 	initButtons(){
+		//shouldn't have to do this
+		//create buttons via createElement, then innerHTML the svg template
+		this.previousBtn = document.querySelector('js-modal-gallery__previous');
+		this.nextBtn = document.querySelector('js-modal-gallery__next');
+		this.closeBtn = document.querySelector('js-modal-gallery__next');
 
-	}
+		this.previousBtn.addEventListener('click', () => {
+			this.previous();
+		});
+		this.nextBtn.addEventListener('click', () => {
+			this.next();
+		});
+		this.closeBtn.addEventListener('click', () => {
+			this.close();
+		});
+
+	},
+	preloadImage(src) {
+		let img = new Image();
+		img.src = src;
+		this.imageCache.push(img);
+	},
 	open(){},
+	previous(){},
+	next(){},
 	close(){}
 };
 
