@@ -82,7 +82,10 @@
             background-color: rgba(0,0,0,.8);
             transition: opacity .5s ease;
         }
-
+        .modal-gallery__outer.active {
+            display: block;
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -91,7 +94,7 @@
     </header>
     <div class="container">
         <h1>Modal Gallery</h1>
-
+        <button class="js-modal-gallery__trigger">Open modal</button>
     </div>
     <script src="./js/app.js"></script>
 </body>

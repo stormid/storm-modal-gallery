@@ -81,19 +81,6 @@ gulp.task('js:es5', function() {
 		.pipe(gulp.dest('dist/'));
 });
 
-gulp.task('js:async', function() {
-    return gulp.src('src/*.js')
-        .pipe(header(banner, {pkg : pkg}))
-		.pipe(browserify({
-          insertGlobals : true,
-          debug : false,
-		  standalone: componentName()
-        }))
-		.pipe(uglify())
-  		.pipe(rename({suffix: '.async.min'}))
-		.pipe(gulp.dest('dist'));
-});
-
 gulp.task('js:es6', function() {
     return gulp.src('src/*.js')
         .pipe(plumber({errorHandler: onError}))

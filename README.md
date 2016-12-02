@@ -1,7 +1,7 @@
 #Storm Modal Gallery 
 
 [![Build Status](https://travis-ci.org/mjbp/storm-modal-gallery.svg?branch=master)](https://travis-ci.org/mjbp/storm-modal-gallery)
-[![codecov.io](http://codecov.io/github/mjbp/storm-toggler/coverage.svg?branch=master)](http://codecov.io/github/mjbp/storm-modal-gallery?branch=master)
+[![codecov.io](http://codecov.io/github/mjbp/storm-modal-gallery/coverage.svg?branch=master)](http://codecov.io/github/mjbp/storm-modal-gallery?branch=master)
 [![npm version](https://badge.fury.io/js/storm-modal-gallery.svg)](https://badge.fury.io/js/storm-modal-gallery)
 
 Modal gallery/lightbox.
