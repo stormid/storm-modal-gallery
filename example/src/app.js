@@ -1,9 +1,10 @@
 import ModalGallery from './libs/storm-modal-gallery';
 
 const onDOMContentLoadedTasks = [() => {
+	
 	let gallery = ModalGallery.init([
 		{
-			src: 'https://unsplash.it/800/?random',
+			src: 'https://i.ytimg.com/vi/yaqe1qesQ8c/maxresdefault.jpg',
 			title: 'Image 1',
 			description: 'Description 1'
 		},
@@ -13,7 +14,10 @@ const onDOMContentLoadedTasks = [() => {
 			description: 'Description 2'
 		}]);
 
-	document.querySelector('.js-modal-gallery__trigger').addEventListener('click', gallery.open.bind(gallery));
+	document.querySelector('.js-modal-gallery__trigger').addEventListener('click', gallery.open.bind(gallery, 0));
+	
+	//ModalGallery.init('.js-modal-gallery');
+
 }];
 
     
