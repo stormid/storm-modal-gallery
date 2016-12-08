@@ -1,6 +1,6 @@
 /**
  * @name storm-modal-gallery: Modal gallery/lightbox
- * @version 0.1.0: Wed, 07 Dec 2016 18:13:47 GMT
+ * @version 0.1.0: Thu, 08 Dec 2016 11:27:08 GMT
  * @author mjbp
  * @license MIT
  */
@@ -40,8 +40,8 @@ const defaults = {
 						<div class="modal-gallery__description">{{description}}</div>
 					</div>`
 		},
-		fullScreen: false,
-		async: false
+		fullscreen: false,
+		preload: false
 	},
 	KEY_CODES = {
 		TAB: 9,
@@ -50,7 +50,7 @@ const defaults = {
 		RIGHT: 39,
 		ENTER: 13
 	},
-	TRIGGER_EVENTS = ['mouseup', 'keydown', 'touchstart'];
+	TRIGGER_EVENTS = ['click', 'keydown', 'touchstart'];
 
 const StormModalGallery = {
 	init() {
@@ -61,19 +61,22 @@ const StormModalGallery = {
 		this.focusableChildren = this.getFocusableChildren();
 		this.initButtons();
 		this.items[0].trigger && this.initTriggers();
+		this.settings.preload && this.items.forEach((item, i) => {
+			this.loadImage(i);
+		});
 		return this;
 	},
 	initTriggers(){
-		/*
 		this.items.forEach((item, i) => {
 			TRIGGER_EVENTS.forEach(ev => {
 				item.trigger.addEventListener(ev, e => {
 					if(e.keyCode && e.keyCode !== KEY_CODES.ENTER) return;
 					e.preventDefault();
+					e.stopPropagation();
 					this.open(i);
 				});
 			});
-		});*/
+		});
 	},
 	initUI(){
 		let renderTemplate = (data, template) => {
@@ -185,13 +188,13 @@ const StormModalGallery = {
 		this.DOMItems[this.current].classList.remove('active');
 		this.current = (this.current === 0 ? this.DOMItems.length - 1 : this.current - 1);
 		this.DOMItems[this.current].classList.add('active');
-		console.log('Previous', this);
+		this.loadImages(this.current);
 	},
 	next(){
 		this.DOMItems[this.current].classList.remove('active');
 		this.current = (this.current === this.DOMItems.length - 1 ? 0 : this.current + 1);
 		this.DOMItems[this.current].classList.add('active');
-		console.log('Next', this);
+		this.loadImages(this.current);
 	},
 	open(i){
 		document.addEventListener('keydown', this.keyListener.bind(this));
@@ -206,7 +209,6 @@ const StormModalGallery = {
 		this.lastFocused.focus();
 		this.DOMItems[this.current].classList.remove('active');
 		this.toggle(null);
-		console.log('Close', this);
 	},
 	toggle(i){
 		this.isOpen = !this.isOpen;
@@ -214,7 +216,18 @@ const StormModalGallery = {
 		this.DOMOverlay.classList.toggle('active');
 		this.DOMOverlay.setAttribute('aria-hidden', !this.isOpen);
 		this.DOMOverlay.setAttribute('tabindex', this.isOpen ? '0' : '-1');
-		console.log('Toggle', this);
+		this.settings.fullscreen && this.toggleFullScreen();
+	},
+	toggleFullScreen(){
+		if(this.isOpen){
+			this.DOMOverlay.requestFullscreen && this.DOMOverlay.requestFullscreen();
+			this.DOMOverlay.webkitRequestFullscreen && this.DOMOverlay.webkitRequestFullscreen();
+			this.DOMOverlay.mozRequestFullScreen && this.DOMOverlay.mozRequestFullScreen();
+		} else {
+			document.exitFullscreen && document.exitFullscreen();
+			document.mozCancelFullScreen && document.mozCancelFullScreen();
+			document.webkitExitFullscreen && document.webkitExitFullscreen();
+		}
 	}
 };
 

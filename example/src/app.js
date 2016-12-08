@@ -1,7 +1,7 @@
 import ModalGallery from './libs/storm-modal-gallery';
 
 const onDOMContentLoadedTasks = [() => {
-	
+	/*
 	let gallery = ModalGallery.init([
 		{
 			src: 'https://i.ytimg.com/vi/yaqe1qesQ8c/maxresdefault.jpg',
@@ -15,8 +15,9 @@ const onDOMContentLoadedTasks = [() => {
 		}]);
 
 	document.querySelector('.js-modal-gallery__trigger').addEventListener('click', gallery.open.bind(gallery, 0));
-	
-	//ModalGallery.init('.js-modal-gallery');
+	*/
+	let gallery = ModalGallery.init('.js-modal-gallery');
+	console.log(gallery);
 
 }];
 

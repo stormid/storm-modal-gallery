@@ -1,6 +1,6 @@
 /**
  * @name storm-modal-gallery: Modal gallery/lightbox
- * @version 0.1.0: Wed, 07 Dec 2016 18:13:47 GMT
+ * @version 0.1.0: Thu, 08 Dec 2016 11:27:08 GMT
  * @author mjbp
  * @license MIT
  */
@@ -29,8 +29,8 @@ var defaults = {
 		item: '<div class="modal-gallery__item js-modal-gallery__item">\n\t\t\t\t\t\t<div class="modal-gallery__img-container js-modal-gallery__img-container"></div>\n\t\t\t\t\t\t{{details}}\n\t\t\t\t\t</div>',
 		details: '<div class="modal-gallery__details">\n\t\t\t\t\t\t<h1 class="modal-gallery__title">{{title}}</h1>\n\t\t\t\t\t\t<div class="modal-gallery__description">{{description}}</div>\n\t\t\t\t\t</div>'
 	},
-	fullScreen: false,
-	async: false
+	fullscreen: false,
+	preload: false
 },
     KEY_CODES = {
 	TAB: 9,
@@ -39,10 +39,12 @@ var defaults = {
 	RIGHT: 39,
 	ENTER: 13
 },
-    TRIGGER_EVENTS = ['mouseup', 'keydown', 'touchstart'];
+    TRIGGER_EVENTS = ['click', 'keydown', 'touchstart'];
 
 var StormModalGallery = {
 	init: function init() {
+		var _this = this;
+
 		this.isOpen = false;
 		this.current = null;
 		this.initUI();
@@ -50,19 +52,24 @@ var StormModalGallery = {
 		this.focusableChildren = this.getFocusableChildren();
 		this.initButtons();
 		this.items[0].trigger && this.initTriggers();
+		this.settings.preload && this.items.forEach(function (item, i) {
+			_this.loadImage(i);
+		});
 		return this;
 	},
 	initTriggers: function initTriggers() {
-		/*
-  this.items.forEach((item, i) => {
-  	TRIGGER_EVENTS.forEach(ev => {
-  		item.trigger.addEventListener(ev, e => {
-  			if(e.keyCode && e.keyCode !== KEY_CODES.ENTER) return;
-  			e.preventDefault();
-  			this.open(i);
-  		});
-  	});
-  });*/
+		var _this2 = this;
+
+		this.items.forEach(function (item, i) {
+			TRIGGER_EVENTS.forEach(function (ev) {
+				item.trigger.addEventListener(ev, function (e) {
+					if (e.keyCode && e.keyCode !== KEY_CODES.ENTER) return;
+					e.preventDefault();
+					e.stopPropagation();
+					_this2.open(i);
+				});
+			});
+		});
 	},
 	initUI: function initUI() {
 		var renderTemplate = function renderTemplate(data, template) {
@@ -101,25 +108,25 @@ var StormModalGallery = {
 		}.bind(this));
 	},
 	loadImage: function loadImage(i) {
-		var _this = this;
+		var _this3 = this;
 
 		var img = new Image(),
 		    imageContainer = this.DOMItems[i].querySelector('.js-modal-gallery__img-container'),
 		    loaded = function loaded() {
-			imageContainer.innerHTML = '<img class="modal-gallery__img" src="' + _this.items[i].src + '" alt="' + _this.items[i].title + '">';
-			_this.DOMItems[i].classList.remove('loading');
+			imageContainer.innerHTML = '<img class="modal-gallery__img" src="' + _this3.items[i].src + '" alt="' + _this3.items[i].title + '">';
+			_this3.DOMItems[i].classList.remove('loading');
 		};
 		img.onload = loaded;
 		img.src = this.items[i].src;
 
 		img.onerror = function () {
-			_this.DOMItems[i].classList.remove('loading');
-			_this.DOMItems[i].classList.add('error');
+			_this3.DOMItems[i].classList.remove('loading');
+			_this3.DOMItems[i].classList.add('error');
 		};
 		if (img.complete) loaded();
 	},
 	loadImages: function loadImages(i) {
-		var _this2 = this;
+		var _this4 = this;
 
 		if (this.imageCache.length === this.items) return;
 
@@ -129,9 +136,9 @@ var StormModalGallery = {
 		if (this.items.length > 2) indexes.push(i === this.items.length - 1 ? 0 : i + 1);
 
 		indexes.forEach(function (idx) {
-			if (_this2.imageCache[idx] === undefined) {
-				_this2.DOMItems[idx].classList.add('loading');
-				_this2.loadImage(idx);
+			if (_this4.imageCache[idx] === undefined) {
+				_this4.DOMItems[idx].classList.add('loading');
+				_this4.loadImage(idx);
 			}
 		});
 	},
@@ -177,13 +184,13 @@ var StormModalGallery = {
 		this.DOMItems[this.current].classList.remove('active');
 		this.current = this.current === 0 ? this.DOMItems.length - 1 : this.current - 1;
 		this.DOMItems[this.current].classList.add('active');
-		console.log('Previous', this);
+		this.loadImages(this.current);
 	},
 	next: function next() {
 		this.DOMItems[this.current].classList.remove('active');
 		this.current = this.current === this.DOMItems.length - 1 ? 0 : this.current + 1;
 		this.DOMItems[this.current].classList.add('active');
-		console.log('Next', this);
+		this.loadImages(this.current);
 	},
 	open: function open(i) {
 		document.addEventListener('keydown', this.keyListener.bind(this));
@@ -200,7 +207,6 @@ var StormModalGallery = {
 		this.lastFocused.focus();
 		this.DOMItems[this.current].classList.remove('active');
 		this.toggle(null);
-		console.log('Close', this);
 	},
 	toggle: function toggle(i) {
 		this.isOpen = !this.isOpen;
@@ -208,7 +214,18 @@ var StormModalGallery = {
 		this.DOMOverlay.classList.toggle('active');
 		this.DOMOverlay.setAttribute('aria-hidden', !this.isOpen);
 		this.DOMOverlay.setAttribute('tabindex', this.isOpen ? '0' : '-1');
-		console.log('Toggle', this);
+		this.settings.fullscreen && this.toggleFullScreen();
+	},
+	toggleFullScreen: function toggleFullScreen() {
+		if (this.isOpen) {
+			this.DOMOverlay.requestFullscreen && this.DOMOverlay.requestFullscreen();
+			this.DOMOverlay.webkitRequestFullscreen && this.DOMOverlay.webkitRequestFullscreen();
+			this.DOMOverlay.mozRequestFullScreen && this.DOMOverlay.mozRequestFullScreen();
+		} else {
+			document.exitFullscreen && document.exitFullscreen();
+			document.mozCancelFullScreen && document.mozCancelFullScreen();
+			document.webkitExitFullscreen && document.webkitExitFullscreen();
+		}
 	}
 };
 

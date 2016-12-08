@@ -51,7 +51,7 @@ ModalGallery.init('.js-modal-gallery');
 e.g.
 ```
 ModalGallery.init('.js-modal-gallery', {
-    delay: 200
+    fullscreen: true
 });
 ```
 
