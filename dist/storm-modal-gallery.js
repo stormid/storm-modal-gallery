@@ -1,6 +1,6 @@
 /**
  * @name storm-modal-gallery: Modal gallery/lightbox
- * @version 0.1.0: Thu, 15 Dec 2016 13:46:54 GMT
+ * @version 0.1.0: Thu, 15 Dec 2016 14:04:14 GMT
  * @author mjbp
  * @license MIT
  */
