@@ -1,6 +1,6 @@
 /**
  * @name storm-modal-gallery: Modal gallery/lightbox
- * @version 0.1.0: Thu, 08 Dec 2016 11:27:08 GMT
+ * @version 0.1.0: Thu, 15 Dec 2016 13:46:55 GMT
  * @author mjbp
  * @license MIT
  */
@@ -113,12 +113,14 @@ var StormModalGallery = {
 		var img = new Image(),
 		    imageContainer = this.DOMItems[i].querySelector('.js-modal-gallery__img-container'),
 		    loaded = function loaded() {
-			imageContainer.innerHTML = '<img class="modal-gallery__img" src="' + _this3.items[i].src + '" alt="' + _this3.items[i].title + '">';
+			var srcsetAttribute = _this3.items[i].srcset ? ' srcset="' + _this3.items[i].srcset + '"' : '',
+			    sizesAttribute = _this3.items[i].sizes ? ' sizes="' + _this3.items[i].sizes + '"' : '';
+			imageContainer.innerHTML = '<img class="modal-gallery__img" src="' + _this3.items[i].src + '" alt="' + _this3.items[i].title + '"' + srcsetAttribute + sizesAttribute + '>';
 			_this3.DOMItems[i].classList.remove('loading');
+			img.onload = null;
 		};
 		img.onload = loaded;
 		img.src = this.items[i].src;
-
 		img.onerror = function () {
 			_this3.DOMItems[i].classList.remove('loading');
 			_this3.DOMItems[i].classList.add('error');
@@ -243,6 +245,8 @@ var init = function init(src, opts) {
 			return {
 				trigger: el,
 				src: el.getAttribute('href'),
+				srcset: el.getAttribute('data-srcset') || null,
+				sizes: el.getAttribute('data-sizes') || null,
 				title: el.getAttribute('data-title') || null,
 				description: el.getAttribute('data-description') || null
 			};

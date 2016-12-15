@@ -112,12 +112,14 @@ const StormModalGallery = {
 		var img = new Image(),
 			imageContainer = this.DOMItems[i].querySelector('.js-modal-gallery__img-container'),
 			loaded = () => {
-				imageContainer.innerHTML = `<img class="modal-gallery__img" src="${this.items[i].src}" alt="${this.items[i].title}">`;
+				let srcsetAttribute = this.items[i].srcset ? ` srcset="${this.items[i].srcset}"` : '',
+					sizesAttribute = this.items[i].sizes ? ` sizes="${this.items[i].sizes}"` : '';
+				imageContainer.innerHTML = `<img class="modal-gallery__img" src="${this.items[i].src}" alt="${this.items[i].title}"${srcsetAttribute}${sizesAttribute}>`;
 				this.DOMItems[i].classList.remove('loading');
+				img.onload = null;
 			};
 		img.onload = loaded;
 		img.src = this.items[i].src;
-		
 		img.onerror = () => {
 			this.DOMItems[i].classList.remove('loading');
 			this.DOMItems[i].classList.add('error');
@@ -239,6 +241,8 @@ const init = (src, opts) => {
 			return {
 				trigger: el,
 				src: el.getAttribute('href'),
+				srcset: el.getAttribute('data-srcset') || null,
+				sizes: el.getAttribute('data-sizes') || null,
 				title: el.getAttribute('data-title') || null,
 				description: el.getAttribute('data-description') || null
 			};
