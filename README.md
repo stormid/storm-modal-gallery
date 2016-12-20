@@ -7,8 +7,14 @@
 Modal gallery/lightbox.
 
 ##Usage
-HTML
+A modal gallery can be created with DOM elements, or programmatically created from a JS Object
+
+To create from HTML:
 ```
+<ul>
+    <li><a class="js-modal-gallery" href="http://placehold.it/500x500" data-title="Image 1" data-description="Description 1" data-srcset="http://placehold.it/800x800 800w, http://placehold.it/500x500 320w">Image one</a></li>
+    <li><a class="js-modal-gallery" href="http://placehold.it/300x800" data-title="Image 2" data-description="Description 2" data-srcset="http://placehold.it/500x800 800w, http://placehold.it/300x500 320w">Image two</a></li>
+</ul>
 ```
 
 JS
@@ -21,7 +27,7 @@ import ModalGallery from 'storm-modal-gallery';
 
 ModalGallery.init('.js-modal-gallery');
 ```
-aynchronous browser loading (use the .standalone version in the /dist folder)
+or aynchronous browser loading (use the .standalone version in the /dist folder)
 ```
 import Load from 'storm-load';
 
@@ -30,13 +36,28 @@ Load('/content/js/async/storm-toggler.standalone.js')
         StormModalGalllery.init('.js-modal-gallery');
     });
 ```
-or es5 commonjs  (legacy, use the .standalone version in the /dist folder)
-```
-var ModalGallery = require('./libs/storm-modal-gallery');
 
-ModalGallery.init('.js-modal-gallery');
+To create from pure JS and triggered from any event:
 ```
+import ModalGallery from 'storm-modal-gallery';
 
+let gallery = ModalGallery.init([
+    {
+        src: 'http://placehold.it/500x500',
+        srcset:'http://placehold.it/800x800 800w, http://placehold.it/500x500 320w',
+        title: 'Image 1',
+        description: 'Description 1'
+    },
+    {
+        src: 'http://placehold.it/300x800',
+        srcset:'http://placehold.it/500x800 800w, http://placehold.it/300x500 320w',
+        title: 'Image 2',
+        description: 'Description 2'
+    }]);
+
+//e.g. Open the gallery by clicking on a button with the className 'js-modal-gallery__trigger'
+document.querySelector('.js-modal-gallery__trigger').addEventListener('click', gallery.open.bind(gallery, 0));
+```
 
 ##Example
 [https://mjbp.github.io/storm-modal-gallery](https://mjbp.github.io/storm-modal-gallery)
@@ -44,8 +65,45 @@ ModalGallery.init('.js-modal-gallery');
 
 ##Options
 ```
-    {
-    }
+{
+    templates: {
+        overlay: `<div class="modal-gallery__outer js-modal-gallery__outer" role="dialog" tabindex="-1" aria-hidden="true">
+                    <div class="modal-gallery__inner js-modal-gallery__inner">
+                        <div class="modal-gallery__content js-modal-gallery__content">
+                            {{items}}
+                        </div>
+                    </div>
+                    <button class="js-modal-gallery__next modal-gallery__next">
+                        <svg role="button" role="button" width="44" height="60">
+                            <polyline points="14 10 34 30 14 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <button class="js-modal-gallery__previous modal-gallery__previous">
+                        <svg role="button" width="44" height="60">
+                            <polyline points="30 10 10 30 30 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <button class="js-modal-gallery__close modal-gallery__close">
+                        <svg role="button" role="button" width="30" height="30">
+                            <g stroke="rgb(255,255,255)" stroke-width="4">
+                                <line x1="5" y1="5" x2="25" y2="25"/>
+                                <line x1="5" y1="25" x2="25" y2="5"/>
+                            </g>
+                        </svg>
+                    </button>
+                </div>`,
+        item: `<div class="modal-gallery__item js-modal-gallery__item">
+                    <div class="modal-gallery__img-container js-modal-gallery__img-container"></div>
+                    {{details}}
+                </div>`,
+        details: `<div class="modal-gallery__details">
+                    <h1 class="modal-gallery__title">{{title}}</h1>
+                    <div class="modal-gallery__description">{{description}}</div>
+                </div>`
+    },
+    fullscreen: false,
+    preload: false
+}
 ```
 
 e.g.
@@ -54,12 +112,6 @@ ModalGallery.init('.js-modal-gallery', {
     fullscreen: true
 });
 ```
-
-
-##API
-####`ModalGallery.init(selector, opts)`
-Initialise the module with a DOM selector and  options object
-
 
 ##Tests
 ```
