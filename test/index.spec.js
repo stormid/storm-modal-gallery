@@ -47,12 +47,12 @@ describe('DOM initialisation', () => {
 describe('Programmatic initialisation', () => {
 	let Gallery = ModalGallery.init([
 		{
-			src: 'https://i.ytimg.com/vi/yaqe1qesQ8c/maxresdefault.jpg',
+			src: 'http://placehold.it/500x500',
 			title: 'Image 1',
 			description: 'Description 1'
 		},
 		{
-			src: 'https://unsplash.it/800/?random',
+			src: 'http://placehold.it/400x400',
 			title: 'Image 2',
 			description: 'Description 2'
 		}], {
