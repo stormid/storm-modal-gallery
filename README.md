@@ -6,7 +6,6 @@
 
 Modal gallery/lightbox.
 
-
 ##Example
 [https://mjbp.github.io/storm-modal-gallery](https://mjbp.github.io/storm-modal-gallery)
 
