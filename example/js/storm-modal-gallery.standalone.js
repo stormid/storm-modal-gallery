@@ -1,6 +1,6 @@
 /**
  * @name storm-modal-gallery: Modal gallery/lightbox
- * @version 0.1.0: Thu, 19 Jan 2017 14:38:44 GMT
+ * @version 0.1.0: Fri, 10 Feb 2017 16:34:26 GMT
  * @author mjbp
  * @license MIT
  */
@@ -134,9 +134,13 @@ var StormModalGallery = {
 
 		var indexes = [i];
 
+		console.log(indexes);
+		console.log(this.items);
+
 		if (this.items.length > 1) indexes.push(i === 0 ? this.items.length - 1 : i - 1);
 		if (this.items.length > 2) indexes.push(i === this.items.length - 1 ? 0 : i + 1);
 
+		console.log(indexes);
 		indexes.forEach(function (idx) {
 			if (_this4.imageCache[idx] === undefined) {
 				_this4.DOMItems[idx].classList.add('loading');
@@ -162,7 +166,7 @@ var StormModalGallery = {
 		}
 	},
 	keyListener: function keyListener(e) {
-		if (!this.open) return;
+		if (!this.isOpen) return;
 
 		switch (e.keyCode) {
 			case KEY_CODES.ESC:
@@ -183,13 +187,13 @@ var StormModalGallery = {
 		}
 	},
 	previous: function previous() {
-		this.DOMItems[this.current].classList.remove('active');
+		this.current && this.DOMItems[this.current].classList.remove('active');
 		this.current = this.current === 0 ? this.DOMItems.length - 1 : this.current - 1;
 		this.DOMItems[this.current].classList.add('active');
 		this.loadImages(this.current);
 	},
 	next: function next() {
-		this.DOMItems[this.current].classList.remove('active');
+		this.current && this.DOMItems[this.current].classList.remove('active');
 		this.current = this.current === this.DOMItems.length - 1 ? 0 : this.current + 1;
 		this.DOMItems[this.current].classList.add('active');
 		this.loadImages(this.current);

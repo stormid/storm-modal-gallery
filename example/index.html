@@ -14,14 +14,13 @@
     <meta property="og:description" content="">
     <meta property="og:site_name" content="">
     <meta name="application-name" content="">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/themes/prism-okaidia.min.css">
     <style>
         * {
             margin:0;
             padding:0;
             box-sizing:border-box;
-            font-family: 'Open Sans', sans-serif;
+            font-family: sans-serif;
         }
         html,
         body {
@@ -35,48 +34,38 @@
             margin:24px 0;
             border:0 none;
         }
-        h1,
-        h2,
-        h3 {
-            font: 1.25rem/1.2 'Open Sans', sans-serif;
+        h1 {
+            font: 1.25rem/1.2 sans-serif;
             margin-bottom:1.5rem;
         }
         h2 {
-            font: 1rem/1.2 'Open Sans', sans-serif;
+            font: 1.1rem/1.2 sans-serif;
+            margin-bottom:12px;
+            padding-top:12px;
+        }
+        h3 {
+            font: 1rem/1.2 sans-serif;
+            margin-bottom:12px;
+            padding-top:12px;
         }
         p {
             margin-bottom:1.5rem;
-        }
-        button {
-            background-color:transparent;
-            padding:0;
-            border:0 none;
-            cursor:pointer;
-            font-size:.85rem;
-        }
-        button svg {
-            fill:blue;
-            position: relative;
-            top:.4rem;
         }
         header {
             width:100%;
             padding:20px;
             margin-bottom:40px;
         }
-        section {
-            margin-bottom: 3rem;
-        }
         .container {
             clear:both;
             overflow:hidden;
             margin:0 auto;
             width:80%;
+            max-width:1200px;
         }
         .row {
-            overflow:hidden;
-            width:100%;
             margin-left:-30px;
+            overflow:hidden
         }
         .modal-gallery__outer {
             display: none;
@@ -157,6 +146,9 @@
         pre {
             margin-bottom:24px !important;
         }
+        .gallery__item {
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -172,67 +164,70 @@
     </header>
     <div class="container">
         <h1>Modal Gallery</h1>
-        <!--
-            Supports creation both programmatic gallery creation, and creation from DOM elements and attributes (Lightbox-style)
-
-            1. Lightbox-style implementation:
-
-            <ul>
-                <li><a class="js-modal-gallery" href="http://placehold.it/500x500" data-title="Image 1" data-description="Description 1" data-srcset="http://placehold.it/800x800 800w, http://placehold.it/500x500 320w">Image one</a></li>
-                <li><a class="js-modal-gallery" href="http://placehold.it/300x500" data-title="Image 2" data-description="Description 2" data-srcset="http://placehold.it/500x800 800w, http://placehold.it/300x500 320w">Image two</a></li>
-                <li><a class="js-modal-gallery" href="http://placehold.it/300x300" data-title="Image 3" data-description="Description 3" data-srcset="http://placehold.it/500x500 800w, http://placehold.it/300x300 320w">Image three</a></li>
-            </ul>
-
-            Only the href and className are required, the anchor can wrap anything, thumbnail, text...
-            
-
-            2. Programmatic initialisation with an array of gallery item items:
-
-            <button class="js-modal-gallery__trigger">View gallery</button>
-
-            let gallery = ModalGallery.init([{
-                    src: 'http://placehold.it/500x500',
-                    srcset:'http://placehold.it/800x800 800w, http://placehold.it/500x500 320w',
-                    title: 'Image 1',
-                    description: 'Description 1'
-                },
-                {
-                    src: 'http://placehold.it/300x500',
-                    srcset:'http://placehold.it/500x800 800w, http://placehold.it/300x500 320w',
-                    title: 'Image 2',
-                    description: 'Description 2'
-                },
-                {
-                    src: 'http://placehold.it/300x300',
-                    srcset:'http://placehold.it/500x500 800w, http://placehold.it/300x300 320w',
-                    title: 'Image 2',
-                    description: 'Description 2'
-                }]);
-	
-	        document.querySelector('.js-modal-gallery__trigger').addEventListener('click', gallery.open.bind(gallery, 0));
-
-            Only required property is src.
-
-        -->
-        
-
-
-        <!--
+        <h2>Example</h2>
+        <p>Supports creation both programmatic gallery creation, and creation from DOM elements and attributes (Lightbox-style)</p>
+        <p>Lightbox-style implementation:</p>
+        <ul>
+            <li class="gallery__item">
+                <a class="js-modal-gallery" href="http://placehold.it/500x500" data-title="Image 1" data-description="Description 1" data-srcset="http://placehold.it/800x800 800w, http://placehold.it/500x500 320w">
+                    <img src="http://placehold.it/200x200" alt="">
+                </a>
+            </li>
+            <li class="gallery__item">
+                <a class="js-modal-gallery" href="http://placehold.it/300x500" data-title="Image 2" data-description="Description 2" data-srcset="http://placehold.it/500x800 800w, http://placehold.it/300x500 320w">
+                    <img src="http://placehold.it/200x200" alt="">
+                </a>
+            </li>
+            <li class="gallery__item">
+                <a class="js-modal-gallery" href="http://placehold.it/300x300" data-title="Image 3" data-description="Description 3" data-srcset="http://placehold.it/500x500 800w, http://placehold.it/300x300 320w">
+                    <img src="http://placehold.it/200x200" alt="">
+                </a>
+            </li>
+        </ul>
         <hr>
         <h2>Installation</h2>
         <pre class="language-markup"><code>$ npm i -S storm-modal-gallery</code></pre>
         <h2>Usage</h2>
+        <h3>HTML for a lightbox-style implementation</h3>
+        <pre><code class="language-html"><script type="prism-html-markup"><ul>
+    <li><a class="js-modal-gallery" href="http://placehold.it/500x500" data-title="Image 1" data-description="Description 1" data-srcset="http://placehold.it/800x800 800w, http://placehold.it/500x500 320w"><img src="http://placehold.it/200x200" alt=""></a></li>
+    <li><a class="js-modal-gallery" href="http://placehold.it/300x500" data-title="Image 2" data-description="Description 2" data-srcset="http://placehold.it/500x800 800w, http://placehold.it/300x500 320w"><img src="http://placehold.it/200x200" alt=""></a></li>
+    <li><a class="js-modal-gallery" href="http://placehold.it/300x300" data-title="Image 3" data-description="Description 3" data-srcset="http://placehold.it/500x500 800w, http://placehold.it/300x300 320w"><img src="http://placehold.it/200x200" alt=""></a></li>
+</ul></script></code></pre>
+        <h3>JS</h3>
         <p>Either import and initialise using a named import:</p>
         <pre><code class="language-js">import ModalGallery from 'storm-modal-gallery';
             
-Boilerplate.init('.js-selector');</code></pre>
-        <p>Or async using storm-load.js, add the .standalone file to your project, then intiialise using the global name:</p>
-        <pre><code class="language-js">Load('/content/js/async/storm-component-boilerplate.standalone.js').then(() => {
-    StormComponentBoilerplate.init('.js-selector');
+ModalGallery.init('.js-modal-gallery');</code></pre>
+        <p>Or async using storm-load.js, add the .standalone file to your project, then initialise using the global name:</p>
+        <pre><code class="language-js">Load('/content/js/async/storm-modal-gallery.standalone.js')
+.then(() => {
+    StormModalGallery.init('.js-modal-gallery');
 });</code></pre>
-    -->
+        <p> Programmatic initialisation with an array of gallery item items:</p>
+        <pre><code class="language-js">import ModalGallery from 'storm-modal-gallery';
+let gallery = ModalGallery.init([{
+    src: 'http://placehold.it/500x500',
+    srcset:'http://placehold.it/800x800 800w, http://placehold.it/500x500 320w',
+    title: 'Image 1',
+    description: 'Description 1'
+},
+{
+    src: 'http://placehold.it/300x500',
+    srcset:'http://placehold.it/500x800 800w, http://placehold.it/300x500 320w',
+    title: 'Image 2',
+    description: 'Description 2'
+},
+{
+    src: 'http://placehold.it/300x300',
+    srcset:'http://placehold.it/500x500 800w, http://placehold.it/300x300 320w',
+    title: 'Image 2',
+    description: 'Description 2'
+}]);
 
-
+//trigger opening, which could be triggered to any DOM event
+gallery.open(0);
+</code></pre>
     </div>
     <script src="./js/app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.6.0/prism.min.js"></script>
