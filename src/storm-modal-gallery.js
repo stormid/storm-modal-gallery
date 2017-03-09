@@ -1,7 +1,6 @@
 const defaults = {
 		templates: {
-			overlay: `<div class="modal-gallery__outer js-modal-gallery__outer" role="dialog" tabindex="-1" aria-hidden="true">
-						<div class="modal-gallery__inner js-modal-gallery__inner">
+			overlay: `<div class="modal-gallery__inner js-modal-gallery__inner">
 							<div class="modal-gallery__content js-modal-gallery__content">
 								{{items}}
 							</div>
@@ -24,7 +23,7 @@ const defaults = {
 								</g>
 							</svg>
 						</button>
-					</div>`,
+						<div class="modal-gallery__total js-gallery-totals"></div>`,
 			item: `<div class="modal-gallery__item js-modal-gallery__item">
 						<div class="modal-gallery__img-container js-modal-gallery__img-container"></div>
 						{{details}}
@@ -35,7 +34,8 @@ const defaults = {
 					</div>`
 		},
 		fullscreen: false,
-		preload: false
+		preload: false,
+		totals: true
 	},
 	KEY_CODES = {
 		TAB: 9,
@@ -86,17 +86,35 @@ const StormModalGallery = {
 			}.bind(this)),
 			itemsString = detailsStringArray.map(function(item) {
 				return this.settings.templates.item.split('{{details}}').join(item);
-			}.bind(this));
+			}.bind(this)),
+			overlay = document.createElement('div');
 
-		document.body.insertAdjacentHTML('beforeend', this.settings.templates.overlay.split('{{items}}').join(itemsString.join('')));
-		this.DOMOverlay = document.querySelector('.js-modal-gallery__outer');
-		this.DOMItems = [].slice.call(document.querySelectorAll('.js-modal-gallery__item'));
+		overlay.className = 'modal-gallery__outer js-modal-gallery__outer';
+		overlay.setAttribute('role', 'dialog');
+		overlay.setAttribute('tabindex', '-1');
+		overlay.setAttribute('aria-hidden', true);
+
+		this.DOMOverlay = document.body.appendChild(overlay);
+
+		this.DOMOverlay.insertAdjacentHTML('beforeend', this.settings.templates.overlay.split('{{items}}').join(itemsString.join('')));
+		this.DOMItems = [].slice.call(this.DOMOverlay.querySelectorAll('.js-modal-gallery__item'));
+		this.DOMTotals = this.DOMOverlay.querySelector('.js-gallery-totals');
 		return this;
 	},
 	initButtons(){
-		this.previousBtn = document.querySelector('.js-modal-gallery__previous');
-		this.nextBtn = document.querySelector('.js-modal-gallery__next');
-		this.closeBtn = document.querySelector('.js-modal-gallery__close');
+		this.previousBtn = this.DOMOverlay.querySelector('.js-modal-gallery__previous');
+		this.nextBtn = this.DOMOverlay.querySelector('.js-modal-gallery__next');
+		this.closeBtn = this.DOMOverlay.querySelector('.js-modal-gallery__close');
+
+		this.closeBtn.addEventListener('click', function() {
+			this.close();
+		}.bind(this));
+
+		if (this.total < 2) {
+			this.previousBtn.parentNode.removeChild(this.previousBtn);
+			this.nextBtn.parentNode.removeChild(this.nextBtn);
+			return;
+		}
 
 		this.previousBtn.addEventListener('click', function() {
 			this.previous();
@@ -104,9 +122,9 @@ const StormModalGallery = {
 		this.nextBtn.addEventListener('click', function() {
 			this.next();
 		}.bind(this));
-		this.closeBtn.addEventListener('click', function() {
-			this.close();
-		}.bind(this));
+	},
+	writeTotals: function writeTotals() {
+		this.DOMTotals.innerHTML = `${this.current + 1}/${this.total}`;
 	},
 	loadImage(i) {
 		var img = new Image(),
@@ -131,13 +149,9 @@ const StormModalGallery = {
 
 		let indexes = [i];
 
-		console.log(indexes);
-		console.log(this.items);
-
 		if(this.items.length > 1) indexes.push(i === 0 ? this.items.length - 1 : i - 1);
 		if(this.items.length > 2) indexes.push(i === this.items.length - 1 ? 0 : i + 1);
 
-		console.log(indexes);
 		indexes.forEach(idx => {
 			if(this.imageCache[idx] === undefined) {
 				this.DOMItems[idx].classList.add('loading');
@@ -189,12 +203,14 @@ const StormModalGallery = {
 		this.current = (this.current === 0 ? this.DOMItems.length - 1 : this.current - 1);
 		this.DOMItems[this.current].classList.add('active');
 		this.loadImages(this.current);
+		(this.total > 1 && this.settings.totals) && this.writeTotals();
 	},
 	next(){
 		this.current && this.DOMItems[this.current].classList.remove('active');
 		this.current = (this.current === this.DOMItems.length - 1 ? 0 : this.current + 1);
 		this.DOMItems[this.current].classList.add('active');
 		this.loadImages(this.current);
+		(this.total > 1 && this.settings.totals) && this.writeTotals();
 	},
 	open(i){
 		document.addEventListener('keydown', this.keyListener.bind(this));
@@ -206,7 +222,7 @@ const StormModalGallery = {
 	},
 	close(){
 		document.removeEventListener('keydown', this.keyListener.bind(this));
-		this.lastFocused.focus();
+		this.lastFocused && this.lastFocused.focus();
 		this.DOMItems[this.current].classList.remove('active');
 		this.toggle(null);
 	},
@@ -217,6 +233,7 @@ const StormModalGallery = {
 		this.DOMOverlay.setAttribute('aria-hidden', !this.isOpen);
 		this.DOMOverlay.setAttribute('tabindex', this.isOpen ? '0' : '-1');
 		this.settings.fullscreen && this.toggleFullScreen();
+		(this.total > 1 && this.settings.totals) && this.writeTotals();
 	},
 	toggleFullScreen(){
 		if(this.isOpen){
@@ -247,8 +264,8 @@ const init = (src, opts) => {
 				src: el.getAttribute('href'),
 				srcset: el.getAttribute('data-srcset') || null,
 				sizes: el.getAttribute('data-sizes') || null,
-				title: el.getAttribute('data-title') || null,
-				description: el.getAttribute('data-description') || null
+				title: el.getAttribute('data-title') || '',
+				description: el.getAttribute('data-description') || ''
 			};
 		});
 	} else {
@@ -257,6 +274,7 @@ const init = (src, opts) => {
 	
 	return Object.assign(Object.create(StormModalGallery), {
 		items: items,
+		total: items.length,
 		settings: Object.assign({}, defaults, opts)
 	}).init();
 };
