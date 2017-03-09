@@ -1,6 +1,6 @@
 /**
  * @name storm-modal-gallery: Modal gallery/lightbox
- * @version 0.1.0: Fri, 10 Feb 2017 16:34:26 GMT
+ * @version 0.2.0: Thu, 09 Mar 2017 17:09:03 GMT
  * @author mjbp
  * @license MIT
  */
@@ -25,12 +25,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 var defaults = {
 	templates: {
-		overlay: '<div class="modal-gallery__outer js-modal-gallery__outer" role="dialog" tabindex="-1" aria-hidden="true">\n\t\t\t\t\t\t<div class="modal-gallery__inner js-modal-gallery__inner">\n\t\t\t\t\t\t\t<div class="modal-gallery__content js-modal-gallery__content">\n\t\t\t\t\t\t\t\t{{items}}\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<button class="js-modal-gallery__next modal-gallery__next">\n\t\t\t\t\t\t\t<svg role="button" role="button" width="44" height="60">\n\t\t\t\t\t\t\t\t<polyline points="14 10 34 30 14 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>\n\t\t\t\t\t\t\t</svg>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t\t<button class="js-modal-gallery__previous modal-gallery__previous">\n\t\t\t\t\t\t\t<svg role="button" width="44" height="60">\n\t\t\t\t\t\t\t\t<polyline points="30 10 10 30 30 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>\n\t\t\t\t\t\t\t</svg>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t\t<button class="js-modal-gallery__close modal-gallery__close">\n\t\t\t\t\t\t\t<svg role="button" role="button" width="30" height="30">\n\t\t\t\t\t\t\t\t<g stroke="rgb(255,255,255)" stroke-width="4">\n\t\t\t\t\t\t\t\t\t<line x1="5" y1="5" x2="25" y2="25"/>\n\t\t\t\t\t\t\t\t\t<line x1="5" y1="25" x2="25" y2="5"/>\n\t\t\t\t\t\t\t\t</g>\n\t\t\t\t\t\t\t</svg>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t</div>',
+		overlay: '<div class="modal-gallery__inner js-modal-gallery__inner">\n\t\t\t\t\t\t\t<div class="modal-gallery__content js-modal-gallery__content">\n\t\t\t\t\t\t\t\t{{items}}\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<button class="js-modal-gallery__next modal-gallery__next">\n\t\t\t\t\t\t\t<svg role="button" role="button" width="44" height="60">\n\t\t\t\t\t\t\t\t<polyline points="14 10 34 30 14 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>\n\t\t\t\t\t\t\t</svg>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t\t<button class="js-modal-gallery__previous modal-gallery__previous">\n\t\t\t\t\t\t\t<svg role="button" width="44" height="60">\n\t\t\t\t\t\t\t\t<polyline points="30 10 10 30 30 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>\n\t\t\t\t\t\t\t</svg>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t\t<button class="js-modal-gallery__close modal-gallery__close">\n\t\t\t\t\t\t\t<svg role="button" role="button" width="30" height="30">\n\t\t\t\t\t\t\t\t<g stroke="rgb(255,255,255)" stroke-width="4">\n\t\t\t\t\t\t\t\t\t<line x1="5" y1="5" x2="25" y2="25"/>\n\t\t\t\t\t\t\t\t\t<line x1="5" y1="25" x2="25" y2="5"/>\n\t\t\t\t\t\t\t\t</g>\n\t\t\t\t\t\t\t</svg>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t\t<div class="modal-gallery__total js-gallery-totals"></div>',
 		item: '<div class="modal-gallery__item js-modal-gallery__item">\n\t\t\t\t\t\t<div class="modal-gallery__img-container js-modal-gallery__img-container"></div>\n\t\t\t\t\t\t{{details}}\n\t\t\t\t\t</div>',
 		details: '<div class="modal-gallery__details">\n\t\t\t\t\t\t<h1 class="modal-gallery__title">{{title}}</h1>\n\t\t\t\t\t\t<div class="modal-gallery__description">{{description}}</div>\n\t\t\t\t\t</div>'
 	},
 	fullscreen: false,
-	preload: false
+	preload: false,
+	totals: true
 },
     KEY_CODES = {
 	TAB: 9,
@@ -85,17 +86,35 @@ var StormModalGallery = {
 		}.bind(this)),
 		    itemsString = detailsStringArray.map(function (item) {
 			return this.settings.templates.item.split('{{details}}').join(item);
-		}.bind(this));
+		}.bind(this)),
+		    overlay = document.createElement('div');
 
-		document.body.insertAdjacentHTML('beforeend', this.settings.templates.overlay.split('{{items}}').join(itemsString.join('')));
-		this.DOMOverlay = document.querySelector('.js-modal-gallery__outer');
-		this.DOMItems = [].slice.call(document.querySelectorAll('.js-modal-gallery__item'));
+		overlay.className = 'modal-gallery__outer js-modal-gallery__outer';
+		overlay.setAttribute('role', 'dialog');
+		overlay.setAttribute('tabindex', '-1');
+		overlay.setAttribute('aria-hidden', true);
+
+		this.DOMOverlay = document.body.appendChild(overlay);
+
+		this.DOMOverlay.insertAdjacentHTML('beforeend', this.settings.templates.overlay.split('{{items}}').join(itemsString.join('')));
+		this.DOMItems = [].slice.call(this.DOMOverlay.querySelectorAll('.js-modal-gallery__item'));
+		this.DOMTotals = this.DOMOverlay.querySelector('.js-gallery-totals');
 		return this;
 	},
 	initButtons: function initButtons() {
-		this.previousBtn = document.querySelector('.js-modal-gallery__previous');
-		this.nextBtn = document.querySelector('.js-modal-gallery__next');
-		this.closeBtn = document.querySelector('.js-modal-gallery__close');
+		this.previousBtn = this.DOMOverlay.querySelector('.js-modal-gallery__previous');
+		this.nextBtn = this.DOMOverlay.querySelector('.js-modal-gallery__next');
+		this.closeBtn = this.DOMOverlay.querySelector('.js-modal-gallery__close');
+
+		this.closeBtn.addEventListener('click', function () {
+			this.close();
+		}.bind(this));
+
+		if (this.total < 2) {
+			this.previousBtn.parentNode.removeChild(this.previousBtn);
+			this.nextBtn.parentNode.removeChild(this.nextBtn);
+			return;
+		}
 
 		this.previousBtn.addEventListener('click', function () {
 			this.previous();
@@ -103,9 +122,10 @@ var StormModalGallery = {
 		this.nextBtn.addEventListener('click', function () {
 			this.next();
 		}.bind(this));
-		this.closeBtn.addEventListener('click', function () {
-			this.close();
-		}.bind(this));
+	},
+
+	writeTotals: function writeTotals() {
+		this.DOMTotals.innerHTML = this.current + 1 + '/' + this.total;
 	},
 	loadImage: function loadImage(i) {
 		var _this3 = this;
@@ -134,13 +154,9 @@ var StormModalGallery = {
 
 		var indexes = [i];
 
-		console.log(indexes);
-		console.log(this.items);
-
 		if (this.items.length > 1) indexes.push(i === 0 ? this.items.length - 1 : i - 1);
 		if (this.items.length > 2) indexes.push(i === this.items.length - 1 ? 0 : i + 1);
 
-		console.log(indexes);
 		indexes.forEach(function (idx) {
 			if (_this4.imageCache[idx] === undefined) {
 				_this4.DOMItems[idx].classList.add('loading');
@@ -191,12 +207,14 @@ var StormModalGallery = {
 		this.current = this.current === 0 ? this.DOMItems.length - 1 : this.current - 1;
 		this.DOMItems[this.current].classList.add('active');
 		this.loadImages(this.current);
+		this.total > 1 && this.settings.totals && this.writeTotals();
 	},
 	next: function next() {
 		this.current && this.DOMItems[this.current].classList.remove('active');
 		this.current = this.current === this.DOMItems.length - 1 ? 0 : this.current + 1;
 		this.DOMItems[this.current].classList.add('active');
 		this.loadImages(this.current);
+		this.total > 1 && this.settings.totals && this.writeTotals();
 	},
 	open: function open(i) {
 		document.addEventListener('keydown', this.keyListener.bind(this));
@@ -210,7 +228,7 @@ var StormModalGallery = {
 	},
 	close: function close() {
 		document.removeEventListener('keydown', this.keyListener.bind(this));
-		this.lastFocused.focus();
+		this.lastFocused && this.lastFocused.focus();
 		this.DOMItems[this.current].classList.remove('active');
 		this.toggle(null);
 	},
@@ -221,6 +239,7 @@ var StormModalGallery = {
 		this.DOMOverlay.setAttribute('aria-hidden', !this.isOpen);
 		this.DOMOverlay.setAttribute('tabindex', this.isOpen ? '0' : '-1');
 		this.settings.fullscreen && this.toggleFullScreen();
+		this.total > 1 && this.settings.totals && this.writeTotals();
 	},
 	toggleFullScreen: function toggleFullScreen() {
 		if (this.isOpen) {
@@ -251,8 +270,8 @@ var init = function init(src, opts) {
 				src: el.getAttribute('href'),
 				srcset: el.getAttribute('data-srcset') || null,
 				sizes: el.getAttribute('data-sizes') || null,
-				title: el.getAttribute('data-title') || null,
-				description: el.getAttribute('data-description') || null
+				title: el.getAttribute('data-title') || '',
+				description: el.getAttribute('data-description') || ''
 			};
 		});
 	} else {
@@ -261,6 +280,7 @@ var init = function init(src, opts) {
 
 	return Object.assign(Object.create(StormModalGallery), {
 		items: items,
+		total: items.length,
 		settings: Object.assign({}, defaults, opts)
 	}).init();
 };
