@@ -20,9 +20,7 @@ const onDOMContentLoadedTasks = [() => {
 	
 	//document.querySelector('.js-modal-gallery__trigger').addEventListener('click', gallery.open.bind(gallery, 0));
 
-	ModalGallery.init('.js-modal-gallery', {
-		totals: false
-	});
+	ModalGallery.init('.js-modal-gallery');
 
 }];
     
