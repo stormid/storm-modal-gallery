@@ -17,7 +17,8 @@
     "modal",
     "gallery",
     "lightbox",
-    "UI"
+    "UI",
+    "component"
   ],
   "scripts": {
     "build": "gulp build",

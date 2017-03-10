@@ -104,7 +104,8 @@ document.querySelector('.js-modal-gallery__trigger').addEventListener('click', g
                 </div>`
     },
     fullscreen: false,
-    preload: false
+    preload: false,
+    totals: true
 }
 ```
 
