@@ -1,4 +1,4 @@
-#Storm Modal Gallery 
+# Storm Modal Gallery 
 
 [![Build Status](https://travis-ci.org/mjbp/storm-modal-gallery.svg?branch=master)](https://travis-ci.org/mjbp/storm-modal-gallery)
 [![codecov.io](http://codecov.io/github/mjbp/storm-modal-gallery/coverage.svg?branch=master)](http://codecov.io/github/mjbp/storm-modal-gallery?branch=master)
@@ -6,11 +6,11 @@
 
 Modal gallery/lightbox.
 
-##Example
+## Example
 [https://mjbp.github.io/storm-modal-gallery](https://mjbp.github.io/storm-modal-gallery)
 
 
-##Usage
+## Usage
 A modal gallery can be created with DOM elements, or programmatically created from a JS Object
 
 To create from HTML:
@@ -154,7 +154,7 @@ document.querySelector('.js-modal-gallery__trigger').addEventListener('click', g
 
 
 
-##Options
+## Options
 ```
 {
     templates: {
@@ -205,19 +205,19 @@ ModalGallery.init('.js-modal-gallery', {
 });
 ```
 
-##Tests
+## Tests
 ```
 npm run test
 ```
 
-##Browser support
+## Browser support
 This is module has both es6 and es5 distributions. The es6 version should be used in a workflow that transpiles.
 
 This module depends upon Object.assign, element.classList, and Promises, available in all evergreen browsers. ie9+ is supported with polyfills, ie8+ will work with even more polyfills for Array functions and eventListeners.
 
 
-##Dependencies
+## Dependencies
 None
 
-##License
+## License
 MIT
