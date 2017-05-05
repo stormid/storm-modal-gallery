@@ -1,4 +1,4 @@
-import ModalGallery from './libs/storm-modal-gallery';
+import ModalGallery from './libs/component';
 
 const onDOMContentLoadedTasks = [() => {
 

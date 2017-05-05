@@ -1,6 +1,6 @@
 /**
  * @name storm-modal-gallery: Modal gallery/lightbox
- * @version 0.3.1: Thu, 16 Mar 2017 16:30:42 GMT
+ * @version 1.0.1: Fri, 05 May 2017 16:22:13 GMT
  * @author mjbp
  * @license MIT
  */
@@ -25,24 +25,25 @@ Object.defineProperty(exports, "__esModule", {
 });
 var defaults = {
 	templates: {
-		overlay: '<div class="modal-gallery__inner js-modal-gallery__inner">\n\t\t\t\t\t\t\t<div class="modal-gallery__content js-modal-gallery__content">\n\t\t\t\t\t\t\t\t{{items}}\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<button class="js-modal-gallery__next modal-gallery__next">\n\t\t\t\t\t\t\t<svg role="button" role="button" width="44" height="60">\n\t\t\t\t\t\t\t\t<polyline points="14 10 34 30 14 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>\n\t\t\t\t\t\t\t</svg>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t\t<button class="js-modal-gallery__previous modal-gallery__previous">\n\t\t\t\t\t\t\t<svg role="button" width="44" height="60">\n\t\t\t\t\t\t\t\t<polyline points="30 10 10 30 30 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>\n\t\t\t\t\t\t\t</svg>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t\t<button class="js-modal-gallery__close modal-gallery__close">\n\t\t\t\t\t\t\t<svg role="button" role="button" width="30" height="30">\n\t\t\t\t\t\t\t\t<g stroke="rgb(255,255,255)" stroke-width="4">\n\t\t\t\t\t\t\t\t\t<line x1="5" y1="5" x2="25" y2="25"/>\n\t\t\t\t\t\t\t\t\t<line x1="5" y1="25" x2="25" y2="5"/>\n\t\t\t\t\t\t\t\t</g>\n\t\t\t\t\t\t\t</svg>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t\t<div class="modal-gallery__total js-gallery-totals"></div>',
-		item: '<div class="modal-gallery__item js-modal-gallery__item">\n\t\t\t\t\t\t<div class="modal-gallery__img-container js-modal-gallery__img-container"></div>\n\t\t\t\t\t\t{{details}}\n\t\t\t\t\t</div>',
-		details: '<div class="modal-gallery__details">\n\t\t\t\t\t\t<h1 class="modal-gallery__title">{{title}}</h1>\n\t\t\t\t\t\t<div class="modal-gallery__description">{{description}}</div>\n\t\t\t\t\t</div>'
+		overlay: '<div class="modal-gallery__inner js-modal-gallery__inner">\n                        <div class="modal-gallery__content js-modal-gallery__content">\n                            {{items}}\n                        </div>\n                    </div>\n                    <button class="js-modal-gallery__next modal-gallery__next">\n                        <svg role="button" role="button" width="44" height="60">\n                            <polyline points="14 10 34 30 14 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>\n                        </svg>\n                    </button>\n                    <button class="js-modal-gallery__previous modal-gallery__previous">\n                        <svg role="button" width="44" height="60">\n                            <polyline points="30 10 10 30 30 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>\n                        </svg>\n                    </button>\n                    <button class="js-modal-gallery__close modal-gallery__close">\n                        <svg role="button" role="button" width="30" height="30">\n                            <g stroke="rgb(255,255,255)" stroke-width="4">\n                                <line x1="5" y1="5" x2="25" y2="25"/>\n                                <line x1="5" y1="25" x2="25" y2="5"/>\n                            </g>\n                        </svg>\n                    </button>\n                    <div class="modal-gallery__total js-gallery-totals"></div>',
+		item: '<div class="modal-gallery__item js-modal-gallery__item">\n                    <div class="modal-gallery__img-container js-modal-gallery__img-container"></div>\n                    {{details}}\n                </div>',
+		details: '<div class="modal-gallery__details">\n                    <h1 class="modal-gallery__title">{{title}}</h1>\n                    <div class="modal-gallery__description">{{description}}</div>\n                </div>'
 	},
 	fullscreen: false,
 	preload: false,
 	totals: true
-},
-    KEY_CODES = {
+};
+
+var KEY_CODES = {
 	TAB: 9,
 	ESC: 27,
 	LEFT: 37,
 	RIGHT: 39,
 	ENTER: 13
-},
-    TRIGGER_EVENTS = ['click', 'keydown', 'touchstart'];
+};
+var TRIGGER_EVENTS = [window.PointerEvent ? 'pointerdown' : 'ontouchstart' in window ? 'touchstart' : 'click', 'keydown'];
 
-var StormModalGallery = {
+var componentPrototype = {
 	init: function init() {
 		var _this = this;
 
@@ -278,12 +279,14 @@ var init = function init(src, opts) {
 		items = src;
 	}
 
-	return Object.assign(Object.create(StormModalGallery), {
+	return Object.assign(Object.create(componentPrototype), {
 		items: items,
 		total: items.length,
 		settings: Object.assign({}, defaults, opts)
 	}).init();
 };
 
-exports.default = { init: init };;
+var index = { init: init };
+
+exports.default = index;;
 }));

@@ -1,58 +1,13 @@
-/**
- * @name storm-modal-gallery: Modal gallery/lightbox
- * @version 0.3.1: Thu, 16 Mar 2017 16:30:41 GMT
- * @author mjbp
- * @license MIT
- */
-const defaults = {
-		templates: {
-			overlay: `<div class="modal-gallery__inner js-modal-gallery__inner">
-							<div class="modal-gallery__content js-modal-gallery__content">
-								{{items}}
-							</div>
-						</div>
-						<button class="js-modal-gallery__next modal-gallery__next">
-							<svg role="button" role="button" width="44" height="60">
-								<polyline points="14 10 34 30 14 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>
-							</svg>
-						</button>
-						<button class="js-modal-gallery__previous modal-gallery__previous">
-							<svg role="button" width="44" height="60">
-								<polyline points="30 10 10 30 30 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>
-							</svg>
-						</button>
-						<button class="js-modal-gallery__close modal-gallery__close">
-							<svg role="button" role="button" width="30" height="30">
-								<g stroke="rgb(255,255,255)" stroke-width="4">
-									<line x1="5" y1="5" x2="25" y2="25"/>
-									<line x1="5" y1="25" x2="25" y2="5"/>
-								</g>
-							</svg>
-						</button>
-						<div class="modal-gallery__total js-gallery-totals"></div>`,
-			item: `<div class="modal-gallery__item js-modal-gallery__item">
-						<div class="modal-gallery__img-container js-modal-gallery__img-container"></div>
-						{{details}}
-					</div>`,
-			details: `<div class="modal-gallery__details">
-						<h1 class="modal-gallery__title">{{title}}</h1>
-						<div class="modal-gallery__description">{{description}}</div>
-					</div>`
-		},
-		fullscreen: false,
-		preload: false,
-		totals: true
-	},
-	KEY_CODES = {
+const KEY_CODES = {
 		TAB: 9,
 		ESC: 27,
 		LEFT: 37,
 		RIGHT: 39,
 		ENTER: 13
 	},
-	TRIGGER_EVENTS = ['click', 'keydown', 'touchstart'];
+	TRIGGER_EVENTS = [window.PointerEvent ? 'pointerdown' : 'ontouchstart' in window ? 'touchstart' : 'click', 'keydown' ];
 
-const StormModalGallery = {
+export default {
 	init() {
 		this.isOpen = false;
 		this.current = null;
@@ -253,36 +208,3 @@ const StormModalGallery = {
 		}
 	}
 };
-
-const init = (src, opts) => {
-	if(!src.length) throw new Error('Modal Gallery cannot be initialised, no images found');
-
-	let items;
-
-	if(typeof src === 'string'){
-		let els = [].slice.call(document.querySelectorAll(src));
-
-		if(!els.length) throw new Error('Modal Gallery cannot be initialised, no images found');
-		
-		items = els.map(el => {
-			return {
-				trigger: el,
-				src: el.getAttribute('href'),
-				srcset: el.getAttribute('data-srcset') || null,
-				sizes: el.getAttribute('data-sizes') || null,
-				title: el.getAttribute('data-title') || '',
-				description: el.getAttribute('data-description') || ''
-			};
-		});
-	} else {
-		items = src;
-	}
-	
-	return Object.assign(Object.create(StormModalGallery), {
-		items: items,
-		total: items.length,
-		settings: Object.assign({}, defaults, opts)
-	}).init();
-};
-
-export default { init };

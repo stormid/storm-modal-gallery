@@ -1,6 +1,6 @@
 import should from 'should';
-import ModalGallery from '../dist/storm-modal-gallery';
 import 'jsdom-global/register';
+import ModalGallery from '../dist/storm-modal-gallery.standalone';
 
 const html = `<button class="js-modal-gallery__trigger">Open modal</button>
 			<ul>
