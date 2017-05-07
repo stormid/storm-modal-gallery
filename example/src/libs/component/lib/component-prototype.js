@@ -1,3 +1,5 @@
+import { overlay, overlayInner, item, details} from './templates';
+
 const KEY_CODES = {
 		TAB: 9,
 		ESC: 27,
@@ -10,15 +12,13 @@ const KEY_CODES = {
 export default {
 	init() {
 		this.isOpen = false;
-		this.current = null;
-		this.initUI();
+		this.current = false;
 		this.imageCache = [];
-		this.focusableChildren = this.getFocusableChildren();
+		this.initUI();
 		this.initButtons();
+		this.focusableChildren = this.getFocusableChildren();
 		this.items[0].trigger && this.initTriggers();
-		this.settings.preload && this.items.forEach((item, i) => {
-			this.loadImage(i);
-		});
+		this.settings.preload && this.items.forEach((item, i) => { this.loadImage(i); });
 		return this;
 	},
 	initTriggers(){
@@ -34,61 +34,37 @@ export default {
 		});
 	},
 	initUI(){
-		let renderTemplate = (data, template) => {
-				for(let datum in data){
-					if(data.hasOwnProperty(datum)){
-						template = template.split(`{{${datum}}}`).join(data[datum]);
-					}
-				}
-				return template;
-			},
-			detailsStringArray = this.items.map(function(img) {
-				return renderTemplate(img, this.settings.templates.details);
-			}.bind(this)),
-			itemsString = detailsStringArray.map(function(item) {
-				return this.settings.templates.item.split('{{details}}').join(item);
-			}.bind(this)),
-			overlay = document.createElement('div');
-
-		overlay.className = 'modal-gallery__outer js-modal-gallery__outer';
-		overlay.setAttribute('role', 'dialog');
-		overlay.setAttribute('tabindex', '-1');
-		overlay.setAttribute('aria-hidden', true);
-
-		this.DOMOverlay = document.body.appendChild(overlay);
-
-		this.DOMOverlay.insertAdjacentHTML('beforeend', this.settings.templates.overlay.split('{{items}}').join(itemsString.join('')));
+		this.DOMOverlay = document.body.appendChild(overlay());
+		this.DOMOverlay.insertAdjacentHTML('beforeend', overlayInner(this.items.map(details).map(item).join('')));
 		this.DOMItems = [].slice.call(this.DOMOverlay.querySelectorAll('.js-modal-gallery__item'));
 		this.DOMTotals = this.DOMOverlay.querySelector('.js-gallery-totals');
 		return this;
 	},
 	initButtons(){
-		this.previousBtn = this.DOMOverlay.querySelector('.js-modal-gallery__previous');
-		this.nextBtn = this.DOMOverlay.querySelector('.js-modal-gallery__next');
 		this.closeBtn = this.DOMOverlay.querySelector('.js-modal-gallery__close');
+		this.closeBtn.addEventListener('click', this.close.bind(this));
 
-		this.closeBtn.addEventListener('click', function() {
-			this.close();
-		}.bind(this));
-
-		if (this.total < 2) {
-			this.previousBtn.parentNode.removeChild(this.previousBtn);
-			this.nextBtn.parentNode.removeChild(this.nextBtn);
+		if (this.items.length < 2) {
+			this.DOMOverlay.removeChild(this.DOMOverlay.querySelector('.js-modal-gallery__previous'));
+			this.DOMOverlay.removeChild(this.DOMOverlay.querySelector('.js-modal-gallery__next'));
 			return;
 		}
 
-		this.previousBtn.addEventListener('click', function() {
-			this.previous();
-		}.bind(this));
-		this.nextBtn.addEventListener('click', function() {
-			this.next();
-		}.bind(this));
+		this.previousBtn = this.DOMOverlay.querySelector('.js-modal-gallery__previous');
+		this.nextBtn = this.DOMOverlay.querySelector('.js-modal-gallery__next');
+
+		TRIGGER_EVENTS.forEach(ev => {
+			['previous', 'next'].forEach(type => {
+				this[`${type}Btn`].addEventListener(ev, e => {
+					if(e.keyCode && e.keyCode !== KEY_CODES.ENTER) return;
+					this[type]();
+				})
+			});
+		});
 	},
-	writeTotals: function writeTotals() {
-		this.DOMTotals.innerHTML = `${this.current + 1}/${this.total}`;
-	},
+	writeTotals() { this.DOMTotals.innerHTML = `${this.current + 1}/${this.items.length}`; },
 	loadImage(i) {
-		var img = new Image(),
+		let img = new Image(),
 			imageContainer = this.DOMItems[i].querySelector('.js-modal-gallery__img-container'),
 			loaded = () => {
 				let srcsetAttribute = this.items[i].srcset ? ` srcset="${this.items[i].srcset}"` : '',
@@ -159,20 +135,15 @@ export default {
 			break;
 		}
 	},
-	previous(){
-		this.current && this.DOMItems[this.current].classList.remove('active');
-		this.current = (this.current === 0 ? this.DOMItems.length - 1 : this.current - 1);
+	incrementDecrement(fn){
+		this.current !== false && this.DOMItems[this.current].classList.remove('active');
+		this.current = fn();
 		this.DOMItems[this.current].classList.add('active');
 		this.loadImages(this.current);
-		(this.total > 1 && this.settings.totals) && this.writeTotals();
+		(this.items.length > 1 && this.settings.totals) && this.writeTotals();
 	},
-	next(){
-		this.current && this.DOMItems[this.current].classList.remove('active');
-		this.current = (this.current === this.DOMItems.length - 1 ? 0 : this.current + 1);
-		this.DOMItems[this.current].classList.add('active');
-		this.loadImages(this.current);
-		(this.total > 1 && this.settings.totals) && this.writeTotals();
-	},
+	previous(){ this.incrementDecrement(() => (this.current === 0 ? this.DOMItems.length - 1 : this.current - 1)); },
+	next(){ this.incrementDecrement(() => (this.current === this.DOMItems.length - 1 ? 0 : this.current + 1)); },
 	open(i){
 		document.addEventListener('keydown', this.keyListener.bind(this));
 		this.loadImages(i);
@@ -194,7 +165,7 @@ export default {
 		this.DOMOverlay.setAttribute('aria-hidden', !this.isOpen);
 		this.DOMOverlay.setAttribute('tabindex', this.isOpen ? '0' : '-1');
 		this.settings.fullscreen && this.toggleFullScreen();
-		(this.total > 1 && this.settings.totals) && this.writeTotals();
+		(this.items.length > 1 && this.settings.totals) && this.writeTotals();
 	},
 	toggleFullScreen(){
 		if(this.isOpen){

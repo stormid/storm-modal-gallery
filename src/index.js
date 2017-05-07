@@ -21,13 +21,10 @@ const init = (src, opts) => {
 				description: el.getAttribute('data-description') || ''
 			};
 		});
-	} else {
-		items = src;
-	}
+	} else items = src;
 	
 	return Object.assign(Object.create(componentPrototype), {
 		items: items,
-		total: items.length,
 		settings: Object.assign({}, defaults, opts)
 	}).init();
 };

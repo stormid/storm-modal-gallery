@@ -1,6 +1,6 @@
 /**
  * @name storm-modal-gallery: Modal gallery/lightbox
- * @version 1.0.1: Fri, 05 May 2017 16:22:12 GMT
+ * @version 1.1.0: Sun, 07 May 2017 15:18:01 GMT
  * @author mjbp
  * @license MIT
  */
@@ -27,13 +27,10 @@ const init = (src, opts) => {
 				description: el.getAttribute('data-description') || ''
 			};
 		});
-	} else {
-		items = src;
-	}
+	} else items = src;
 	
 	return Object.assign(Object.create(componentPrototype), {
 		items: items,
-		total: items.length,
 		settings: Object.assign({}, defaults, opts)
 	}).init();
 };
