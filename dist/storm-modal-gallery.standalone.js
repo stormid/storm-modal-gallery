@@ -1,6 +1,6 @@
 /**
  * @name storm-modal-gallery: Modal gallery/lightbox
- * @version 1.1.0: Sun, 07 May 2017 15:18:01 GMT
+ * @version 1.2.1: Thu, 25 May 2017 16:22:59 GMT
  * @author mjbp
  * @license MIT
  */
@@ -26,7 +26,9 @@ Object.defineProperty(exports, "__esModule", {
 var defaults = {
 	fullscreen: false,
 	preload: false,
-	totals: true
+	totals: true,
+	scrollable: false,
+	single: false
 };
 
 var overlay = function overlay() {
@@ -130,10 +132,11 @@ var componentPrototype = {
 
 		var img = new Image(),
 		    imageContainer = this.DOMItems[i].querySelector('.js-modal-gallery__img-container'),
+		    imageClassName = this.settings.scrollable ? 'modal-gallery__img modal-gallery__img--scrollable' : 'modal-gallery__img',
 		    loaded = function loaded() {
 			var srcsetAttribute = _this4.items[i].srcset ? ' srcset="' + _this4.items[i].srcset + '"' : '',
 			    sizesAttribute = _this4.items[i].sizes ? ' sizes="' + _this4.items[i].sizes + '"' : '';
-			imageContainer.innerHTML = '<img class="modal-gallery__img" src="' + _this4.items[i].src + '" alt="' + _this4.items[i].title + '"' + srcsetAttribute + sizesAttribute + '>';
+			imageContainer.innerHTML = '<img class="' + imageClassName + '" src="' + _this4.items[i].src + '" alt="' + _this4.items[i].title + '"' + srcsetAttribute + sizesAttribute + '>';
 			_this4.DOMItems[i].classList.remove('loading');
 			img.onload = null;
 		};
@@ -259,9 +262,31 @@ var componentPrototype = {
 	}
 };
 
-var init = function init(src, opts) {
-	if (!src.length) throw new Error('Modal Gallery cannot be initialised, no images found');
+var create = function create(items, opts) {
+	return Object.assign(Object.create(componentPrototype), {
+		items: items,
+		settings: Object.assign({}, defaults, opts)
+	}).init();
+};
 
+var singles = function singles(src, opts) {
+	var els = [].slice.call(document.querySelectorAll(src));
+
+	if (!els.length) throw new Error('Modal Gallery cannot be initialised, no images found');
+
+	return els.map(function (el) {
+		return create([{
+			trigger: el,
+			src: el.getAttribute('href'),
+			srcset: el.getAttribute('data-srcset') || null,
+			sizes: el.getAttribute('data-sizes') || null,
+			title: el.getAttribute('data-title') || '',
+			description: el.getAttribute('data-description') || ''
+		}], opts);
+	});
+};
+
+var galleries = function galleries(src, opts) {
 	var items = void 0;
 
 	if (typeof src === 'string') {
@@ -281,10 +306,13 @@ var init = function init(src, opts) {
 		});
 	} else items = src;
 
-	return Object.assign(Object.create(componentPrototype), {
-		items: items,
-		settings: Object.assign({}, defaults, opts)
-	}).init();
+	return create(items, opts);
+};
+
+var init = function init(src, opts) {
+	if (!src.length) throw new Error('Modal Gallery cannot be initialised, no images found');
+
+	if (opts && opts.single) return singles(src, opts);else return galleries(src, opts);
 };
 
 var index = { init: init };

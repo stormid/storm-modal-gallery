@@ -22,6 +22,10 @@ const onDOMContentLoadedTasks = [() => {
 
 	ModalGallery.init('.js-modal-gallery');
 
+	ModalGallery.init('.js-modal-single', {
+		single: true
+	});
+
 }];
     
 if('addEventListener' in window) window.addEventListener('DOMContentLoaded', () => { onDOMContentLoadedTasks.forEach(fn => fn()); });

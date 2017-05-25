@@ -1,4 +1,9 @@
-import { overlay, overlayInner, item, details} from './templates';
+import { 
+	overlay,
+	overlayInner,
+	item,
+	details
+} from './templates';
 
 const KEY_CODES = {
 		TAB: 9,
@@ -66,10 +71,11 @@ export default {
 	loadImage(i) {
 		let img = new Image(),
 			imageContainer = this.DOMItems[i].querySelector('.js-modal-gallery__img-container'),
+			imageClassName = this.settings.scrollable ? 'modal-gallery__img modal-gallery__img--scrollable' : 'modal-gallery__img',
 			loaded = () => {
 				let srcsetAttribute = this.items[i].srcset ? ` srcset="${this.items[i].srcset}"` : '',
 					sizesAttribute = this.items[i].sizes ? ` sizes="${this.items[i].sizes}"` : '';
-				imageContainer.innerHTML = `<img class="modal-gallery__img" src="${this.items[i].src}" alt="${this.items[i].title}"${srcsetAttribute}${sizesAttribute}>`;
+				imageContainer.innerHTML = `<img class="${imageClassName}" src="${this.items[i].src}" alt="${this.items[i].title}"${srcsetAttribute}${sizesAttribute}>`;
 				this.DOMItems[i].classList.remove('loading');
 				img.onload = null;
 			};

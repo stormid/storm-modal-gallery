@@ -159,7 +159,9 @@ document.querySelector('.js-modal-gallery__trigger').addEventListener('click', g
 {
     fullscreen: false,
     preload: false,
-    totals: true
+    totals: true //show current and totalnumber of images
+    scrollable: false, //add className to apply CSS to support scrollable content
+    single: false // separate single images, do not collect into a gallery
 }
 ```
 

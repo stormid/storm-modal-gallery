@@ -1,5 +1,7 @@
 export default {
     fullscreen: false,
     preload: false,
-    totals: true
+    totals: true,
+    scrollable: false,
+    single: false
 };
