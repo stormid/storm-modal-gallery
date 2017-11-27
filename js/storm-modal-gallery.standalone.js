@@ -1,6 +1,6 @@
 /**
  * @name storm-modal-gallery: Modal gallery/lightbox
- * @version 0.3.1: Thu, 16 Mar 2017 16:30:42 GMT
+ * @version 1.2.1: Mon, 27 Nov 2017 20:27:03 GMT
  * @author mjbp
  * @license MIT
  */
@@ -24,36 +24,54 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 var defaults = {
-	templates: {
-		overlay: '<div class="modal-gallery__inner js-modal-gallery__inner">\n\t\t\t\t\t\t\t<div class="modal-gallery__content js-modal-gallery__content">\n\t\t\t\t\t\t\t\t{{items}}\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<button class="js-modal-gallery__next modal-gallery__next">\n\t\t\t\t\t\t\t<svg role="button" role="button" width="44" height="60">\n\t\t\t\t\t\t\t\t<polyline points="14 10 34 30 14 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>\n\t\t\t\t\t\t\t</svg>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t\t<button class="js-modal-gallery__previous modal-gallery__previous">\n\t\t\t\t\t\t\t<svg role="button" width="44" height="60">\n\t\t\t\t\t\t\t\t<polyline points="30 10 10 30 30 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>\n\t\t\t\t\t\t\t</svg>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t\t<button class="js-modal-gallery__close modal-gallery__close">\n\t\t\t\t\t\t\t<svg role="button" role="button" width="30" height="30">\n\t\t\t\t\t\t\t\t<g stroke="rgb(255,255,255)" stroke-width="4">\n\t\t\t\t\t\t\t\t\t<line x1="5" y1="5" x2="25" y2="25"/>\n\t\t\t\t\t\t\t\t\t<line x1="5" y1="25" x2="25" y2="5"/>\n\t\t\t\t\t\t\t\t</g>\n\t\t\t\t\t\t\t</svg>\n\t\t\t\t\t\t</button>\n\t\t\t\t\t\t<div class="modal-gallery__total js-gallery-totals"></div>',
-		item: '<div class="modal-gallery__item js-modal-gallery__item">\n\t\t\t\t\t\t<div class="modal-gallery__img-container js-modal-gallery__img-container"></div>\n\t\t\t\t\t\t{{details}}\n\t\t\t\t\t</div>',
-		details: '<div class="modal-gallery__details">\n\t\t\t\t\t\t<h1 class="modal-gallery__title">{{title}}</h1>\n\t\t\t\t\t\t<div class="modal-gallery__description">{{description}}</div>\n\t\t\t\t\t</div>'
-	},
 	fullscreen: false,
 	preload: false,
-	totals: true
-},
-    KEY_CODES = {
+	totals: true,
+	scrollable: false,
+	single: false
+};
+
+var overlay = function overlay() {
+	var overlay = document.createElement('div');
+
+	overlay.className = 'modal-gallery__outer js-modal-gallery__outer';
+	overlay.setAttribute('role', 'dialog');
+	overlay.setAttribute('tabindex', '-1');
+	overlay.setAttribute('aria-hidden', true);
+
+	return overlay;
+};
+
+var overlayInner = function overlayInner(items) {
+	return '<div class="modal-gallery__inner js-modal-gallery__inner">\n                                    <div class="modal-gallery__content js-modal-gallery__content">\n                                        ' + items + '\n                                    </div>\n                                </div>\n                                <button class="js-modal-gallery__next modal-gallery__next">\n                                    <svg role="button" role="button" width="44" height="60">\n                                        <polyline points="14 10 34 30 14 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>\n                                    </svg>\n                                </button>\n                                <button class="js-modal-gallery__previous modal-gallery__previous">\n                                    <svg role="button" width="44" height="60">\n                                        <polyline points="30 10 10 30 30 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>\n                                    </svg>\n                                </button>\n                                <button class="js-modal-gallery__close modal-gallery__close">\n                                    <svg role="button" role="button" width="30" height="30">\n                                        <g stroke="rgb(255,255,255)" stroke-width="4">\n                                            <line x1="5" y1="5" x2="25" y2="25"/>\n                                            <line x1="5" y1="25" x2="25" y2="5"/>\n                                        </g>\n                                    </svg>\n                                </button>\n                                <div class="modal-gallery__total js-gallery-totals"></div>';
+};
+
+var item = function item(details) {
+	return '<div class="modal-gallery__item js-modal-gallery__item">\n                                    <div class="modal-gallery__img-container js-modal-gallery__img-container"></div>\n                                    ' + details + '\n                                </div>';
+};
+
+var details = function details(item) {
+	return '<div class="modal-gallery__details">\n                                    <h1 class="modal-gallery__title">' + item.title + '</h1>\n                                    <div class="modal-gallery__description">' + item.description + '</div>\n                                </div>';
+};
+
+var KEY_CODES = {
 	TAB: 9,
 	ESC: 27,
 	LEFT: 37,
 	RIGHT: 39,
 	ENTER: 13
-},
-    TRIGGER_EVENTS = ['click', 'keydown', 'touchstart'];
+};
+var TRIGGER_EVENTS = [window.PointerEvent ? 'pointerdown' : 'ontouchstart' in window ? 'touchstart' : 'click', 'keydown'];
 
-var StormModalGallery = {
+var componentPrototype = {
 	init: function init() {
 		var _this = this;
 
 		this.isOpen = false;
-		this.current = null;
-		this.initUI();
+		this.current = false;
 		this.imageCache = [];
-		this.focusableChildren = this.getFocusableChildren();
-		this.initButtons();
 		this.items[0].trigger && this.initTriggers();
-		this.settings.preload && this.items.forEach(function (item, i) {
+		this.settings.preload && this.items.forEach(function (item$$1, i) {
 			_this.loadImage(i);
 		});
 		return this;
@@ -61,9 +79,9 @@ var StormModalGallery = {
 	initTriggers: function initTriggers() {
 		var _this2 = this;
 
-		this.items.forEach(function (item, i) {
+		this.items.forEach(function (item$$1, i) {
 			TRIGGER_EVENTS.forEach(function (ev) {
-				item.trigger.addEventListener(ev, function (e) {
+				item$$1.trigger.addEventListener(ev, function (e) {
 					if (e.keyCode && e.keyCode !== KEY_CODES.ENTER) return;
 					e.preventDefault();
 					e.stopPropagation();
@@ -72,85 +90,75 @@ var StormModalGallery = {
 			});
 		});
 	},
-	initUI: function initUI() {
-		var renderTemplate = function renderTemplate(data, template) {
-			for (var datum in data) {
-				if (data.hasOwnProperty(datum)) {
-					template = template.split('{{' + datum + '}}').join(data[datum]);
-				}
-			}
-			return template;
-		},
-		    detailsStringArray = this.items.map(function (img) {
-			return renderTemplate(img, this.settings.templates.details);
-		}.bind(this)),
-		    itemsString = detailsStringArray.map(function (item) {
-			return this.settings.templates.item.split('{{details}}').join(item);
-		}.bind(this)),
-		    overlay = document.createElement('div');
+	initUI: function initUI(i) {
+		var _this3 = this;
 
-		overlay.className = 'modal-gallery__outer js-modal-gallery__outer';
-		overlay.setAttribute('role', 'dialog');
-		overlay.setAttribute('tabindex', '-1');
-		overlay.setAttribute('aria-hidden', true);
-
-		this.DOMOverlay = document.body.appendChild(overlay);
-
-		this.DOMOverlay.insertAdjacentHTML('beforeend', this.settings.templates.overlay.split('{{items}}').join(itemsString.join('')));
+		this.DOMOverlay = document.body.appendChild(overlay());
+		this.DOMOverlay.insertAdjacentHTML('beforeend', overlayInner(this.items.map(details).map(item).join('')));
 		this.DOMItems = [].slice.call(this.DOMOverlay.querySelectorAll('.js-modal-gallery__item'));
 		this.DOMTotals = this.DOMOverlay.querySelector('.js-gallery-totals');
+		if (this.imageCache.length === this.items.length) this.imageCache.forEach(function (img, i) {
+			_this3.writeImage(i);
+		});else this.loadImages(i);
 		return this;
 	},
+	unmountUI: function unmountUI() {
+		this.DOMOverlay.parentNode.removeChild(this.DOMOverlay);
+	},
 	initButtons: function initButtons() {
-		this.previousBtn = this.DOMOverlay.querySelector('.js-modal-gallery__previous');
-		this.nextBtn = this.DOMOverlay.querySelector('.js-modal-gallery__next');
+		var _this4 = this;
+
 		this.closeBtn = this.DOMOverlay.querySelector('.js-modal-gallery__close');
+		this.closeBtn.addEventListener('click', this.close.bind(this));
 
-		this.closeBtn.addEventListener('click', function () {
-			this.close();
-		}.bind(this));
-
-		if (this.total < 2) {
-			this.previousBtn.parentNode.removeChild(this.previousBtn);
-			this.nextBtn.parentNode.removeChild(this.nextBtn);
+		if (this.items.length < 2) {
+			this.DOMOverlay.removeChild(this.DOMOverlay.querySelector('.js-modal-gallery__previous'));
+			this.DOMOverlay.removeChild(this.DOMOverlay.querySelector('.js-modal-gallery__next'));
 			return;
 		}
 
-		this.previousBtn.addEventListener('click', function () {
-			this.previous();
-		}.bind(this));
-		this.nextBtn.addEventListener('click', function () {
-			this.next();
-		}.bind(this));
-	},
+		this.previousBtn = this.DOMOverlay.querySelector('.js-modal-gallery__previous');
+		this.nextBtn = this.DOMOverlay.querySelector('.js-modal-gallery__next');
 
+		TRIGGER_EVENTS.forEach(function (ev) {
+			['previous', 'next'].forEach(function (type) {
+				_this4[type + 'Btn'].addEventListener(ev, function (e) {
+					if (e.keyCode && e.keyCode !== KEY_CODES.ENTER) return;
+					_this4[type]();
+				});
+			});
+		});
+	},
 	writeTotals: function writeTotals() {
-		this.DOMTotals.innerHTML = this.current + 1 + '/' + this.total;
+		this.DOMTotals.innerHTML = this.current + 1 + '/' + this.items.length;
+	},
+	writeImage: function writeImage(i) {
+		var imageContainer = this.DOMItems[i].querySelector('.js-modal-gallery__img-container'),
+		    imageClassName = this.settings.scrollable ? 'modal-gallery__img modal-gallery__img--scrollable' : 'modal-gallery__img',
+		    srcsetAttribute = this.items[i].srcset ? ' srcset="' + this.items[i].srcset + '"' : '',
+		    sizesAttribute = this.items[i].sizes ? ' sizes="' + this.items[i].sizes + '"' : '';
+
+		imageContainer.innerHTML = '<img class="' + imageClassName + '" src="' + this.items[i].src + '" alt="' + this.items[i].title + '"' + srcsetAttribute + sizesAttribute + '>';
+		this.DOMItems[i].classList.remove('loading');
 	},
 	loadImage: function loadImage(i) {
-		var _this3 = this;
+		var _this5 = this;
 
 		var img = new Image(),
-		    imageContainer = this.DOMItems[i].querySelector('.js-modal-gallery__img-container'),
 		    loaded = function loaded() {
-			var srcsetAttribute = _this3.items[i].srcset ? ' srcset="' + _this3.items[i].srcset + '"' : '',
-			    sizesAttribute = _this3.items[i].sizes ? ' sizes="' + _this3.items[i].sizes + '"' : '';
-			imageContainer.innerHTML = '<img class="modal-gallery__img" src="' + _this3.items[i].src + '" alt="' + _this3.items[i].title + '"' + srcsetAttribute + sizesAttribute + '>';
-			_this3.DOMItems[i].classList.remove('loading');
-			img.onload = null;
+			_this5.imageCache[i] = img;
+			_this5.writeImage(i);
 		};
 		img.onload = loaded;
 		img.src = this.items[i].src;
 		img.onerror = function () {
-			_this3.DOMItems[i].classList.remove('loading');
-			_this3.DOMItems[i].classList.add('error');
+			_this5.DOMItems[i].classList.remove('loading');
+			_this5.DOMItems[i].classList.add('error');
 		};
 		if (img.complete) loaded();
 	},
 	loadImages: function loadImages(i) {
-		var _this4 = this;
-
-		if (this.imageCache.length === this.items) return;
+		var _this6 = this;
 
 		var indexes = [i];
 
@@ -158,9 +166,9 @@ var StormModalGallery = {
 		if (this.items.length > 2) indexes.push(i === this.items.length - 1 ? 0 : i + 1);
 
 		indexes.forEach(function (idx) {
-			if (_this4.imageCache[idx] === undefined) {
-				_this4.DOMItems[idx].classList.add('loading');
-				_this4.loadImage(idx);
+			if (_this6.imageCache[idx] === undefined) {
+				_this6.DOMItems[idx].classList.add('loading');
+				_this6.loadImage(idx);
 			}
 		});
 	},
@@ -202,23 +210,32 @@ var StormModalGallery = {
 				break;
 		}
 	},
-	previous: function previous() {
-		this.current && this.DOMItems[this.current].classList.remove('active');
-		this.current = this.current === 0 ? this.DOMItems.length - 1 : this.current - 1;
+	incrementDecrement: function incrementDecrement(fn) {
+		this.current !== false && this.DOMItems[this.current].classList.remove('active');
+		this.current = fn();
 		this.DOMItems[this.current].classList.add('active');
 		this.loadImages(this.current);
-		this.total > 1 && this.settings.totals && this.writeTotals();
+		this.items.length > 1 && this.settings.totals && this.writeTotals();
+	},
+	previous: function previous() {
+		var _this7 = this;
+
+		this.incrementDecrement(function () {
+			return _this7.current === 0 ? _this7.DOMItems.length - 1 : _this7.current - 1;
+		});
 	},
 	next: function next() {
-		this.current && this.DOMItems[this.current].classList.remove('active');
-		this.current = this.current === this.DOMItems.length - 1 ? 0 : this.current + 1;
-		this.DOMItems[this.current].classList.add('active');
-		this.loadImages(this.current);
-		this.total > 1 && this.settings.totals && this.writeTotals();
+		var _this8 = this;
+
+		this.incrementDecrement(function () {
+			return _this8.current === _this8.DOMItems.length - 1 ? 0 : _this8.current + 1;
+		});
 	},
 	open: function open(i) {
+		this.initUI(i);
+		this.initButtons();
+		this.focusableChildren = this.getFocusableChildren();
 		document.addEventListener('keydown', this.keyListener.bind(this));
-		this.loadImages(i);
 		this.lastFocused = document.activeElement;
 		this.focusableChildren.length && window.setTimeout(function () {
 			this.focusableChildren[0].focus();
@@ -231,6 +248,7 @@ var StormModalGallery = {
 		this.lastFocused && this.lastFocused.focus();
 		this.DOMItems[this.current].classList.remove('active');
 		this.toggle(null);
+		this.unmountUI();
 	},
 	toggle: function toggle(i) {
 		this.isOpen = !this.isOpen;
@@ -239,7 +257,7 @@ var StormModalGallery = {
 		this.DOMOverlay.setAttribute('aria-hidden', !this.isOpen);
 		this.DOMOverlay.setAttribute('tabindex', this.isOpen ? '0' : '-1');
 		this.settings.fullscreen && this.toggleFullScreen();
-		this.total > 1 && this.settings.totals && this.writeTotals();
+		this.items.length > 1 && this.settings.totals && this.writeTotals();
 	},
 	toggleFullScreen: function toggleFullScreen() {
 		if (this.isOpen) {
@@ -254,9 +272,31 @@ var StormModalGallery = {
 	}
 };
 
-var init = function init(src, opts) {
-	if (!src.length) throw new Error('Modal Gallery cannot be initialised, no images found');
+var create = function create(items, opts) {
+	return Object.assign(Object.create(componentPrototype), {
+		items: items,
+		settings: Object.assign({}, defaults, opts)
+	}).init();
+};
 
+var singles = function singles(src, opts) {
+	var els = [].slice.call(document.querySelectorAll(src));
+
+	if (!els.length) throw new Error('Modal Gallery cannot be initialised, no images found');
+
+	return els.map(function (el) {
+		return create([{
+			trigger: el,
+			src: el.getAttribute('href'),
+			srcset: el.getAttribute('data-srcset') || null,
+			sizes: el.getAttribute('data-sizes') || null,
+			title: el.getAttribute('data-title') || '',
+			description: el.getAttribute('data-description') || ''
+		}], opts);
+	});
+};
+
+var galleries = function galleries(src, opts) {
 	var items = void 0;
 
 	if (typeof src === 'string') {
@@ -274,16 +314,18 @@ var init = function init(src, opts) {
 				description: el.getAttribute('data-description') || ''
 			};
 		});
-	} else {
-		items = src;
-	}
+	} else items = src;
 
-	return Object.assign(Object.create(StormModalGallery), {
-		items: items,
-		total: items.length,
-		settings: Object.assign({}, defaults, opts)
-	}).init();
+	return create(items, opts);
 };
 
-exports.default = { init: init };;
+var init = function init(src, opts) {
+	if (!src.length) throw new Error('Modal Gallery cannot be initialised, no images found');
+
+	if (opts && opts.single) return singles(src, opts);else return galleries(src, opts);
+};
+
+var index = { init: init };
+
+exports.default = index;;
 }));

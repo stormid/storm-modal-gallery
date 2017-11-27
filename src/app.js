@@ -1,4 +1,4 @@
-import ModalGallery from './libs/storm-modal-gallery';
+import ModalGallery from './libs/component';
 
 const onDOMContentLoadedTasks = [() => {
 
@@ -21,6 +21,10 @@ const onDOMContentLoadedTasks = [() => {
 	//document.querySelector('.js-modal-gallery__trigger').addEventListener('click', gallery.open.bind(gallery, 0));
 
 	ModalGallery.init('.js-modal-gallery');
+
+	ModalGallery.init('.js-modal-single', {
+		single: true
+	});
 
 }];
     
