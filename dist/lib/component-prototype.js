@@ -19,9 +19,6 @@ export default {
 		this.isOpen = false;
 		this.current = false;
 		this.imageCache = [];
-		this.initUI();
-		this.initButtons();
-		this.focusableChildren = this.getFocusableChildren();
 		this.items[0].trigger && this.initTriggers();
 		this.settings.preload && this.items.forEach((item, i) => { this.loadImage(i); });
 		return this;
@@ -38,12 +35,17 @@ export default {
 			});
 		});
 	},
-	initUI(){
+	initUI(i){
 		this.DOMOverlay = document.body.appendChild(overlay());
 		this.DOMOverlay.insertAdjacentHTML('beforeend', overlayInner(this.items.map(details).map(item).join('')));
 		this.DOMItems = [].slice.call(this.DOMOverlay.querySelectorAll('.js-modal-gallery__item'));
 		this.DOMTotals = this.DOMOverlay.querySelector('.js-gallery-totals');
+		if(this.imageCache.length === this.items.length) this.imageCache.forEach((img, i) => { this.writeImage(i); });
+		else this.loadImages(i);
 		return this;
+	},
+	unmountUI(){
+		this.DOMOverlay.parentNode.removeChild(this.DOMOverlay);
 	},
 	initButtons(){
 		this.closeBtn = this.DOMOverlay.querySelector('.js-modal-gallery__close');
@@ -68,16 +70,20 @@ export default {
 		});
 	},
 	writeTotals() { this.DOMTotals.innerHTML = `${this.current + 1}/${this.items.length}`; },
+	writeImage(i){
+		let imageContainer = this.DOMItems[i].querySelector('.js-modal-gallery__img-container'),
+			imageClassName = this.settings.scrollable ? 'modal-gallery__img modal-gallery__img--scrollable' : 'modal-gallery__img',
+			srcsetAttribute = this.items[i].srcset ? ` srcset="${this.items[i].srcset}"` : '',
+			sizesAttribute = this.items[i].sizes ? ` sizes="${this.items[i].sizes}"` : '';
+		
+		imageContainer.innerHTML = `<img class="${imageClassName}" src="${this.items[i].src}" alt="${this.items[i].title}"${srcsetAttribute}${sizesAttribute}>`;
+		this.DOMItems[i].classList.remove('loading');
+	},
 	loadImage(i) {
 		let img = new Image(),
-			imageContainer = this.DOMItems[i].querySelector('.js-modal-gallery__img-container'),
-			imageClassName = this.settings.scrollable ? 'modal-gallery__img modal-gallery__img--scrollable' : 'modal-gallery__img',
-			loaded = () => {
-				let srcsetAttribute = this.items[i].srcset ? ` srcset="${this.items[i].srcset}"` : '',
-					sizesAttribute = this.items[i].sizes ? ` sizes="${this.items[i].sizes}"` : '';
-				imageContainer.innerHTML = `<img class="${imageClassName}" src="${this.items[i].src}" alt="${this.items[i].title}"${srcsetAttribute}${sizesAttribute}>`;
-				this.DOMItems[i].classList.remove('loading');
-				img.onload = null;
+			loaded = () => { 
+				this.imageCache[i] = img;
+				this.writeImage(i);
 			};
 		img.onload = loaded;
 		img.src = this.items[i].src;
@@ -88,8 +94,6 @@ export default {
 		if(img.complete) loaded();
 	},
 	loadImages(i){
-		if(this.imageCache.length === this.items) return;
-
 		let indexes = [i];
 
 		if(this.items.length > 1) indexes.push(i === 0 ? this.items.length - 1 : i - 1);
@@ -151,8 +155,10 @@ export default {
 	previous(){ this.incrementDecrement(() => (this.current === 0 ? this.DOMItems.length - 1 : this.current - 1)); },
 	next(){ this.incrementDecrement(() => (this.current === this.DOMItems.length - 1 ? 0 : this.current + 1)); },
 	open(i){
+		this.initUI(i);
+		this.initButtons();
+		this.focusableChildren = this.getFocusableChildren();
 		document.addEventListener('keydown', this.keyListener.bind(this));
-		this.loadImages(i);
 		this.lastFocused =  document.activeElement;
 		this.focusableChildren.length && window.setTimeout(function(){this.focusableChildren[0].focus();}.bind(this), 0);
 		this.DOMItems[i || 0].classList.add('active');
@@ -163,6 +169,7 @@ export default {
 		this.lastFocused && this.lastFocused.focus();
 		this.DOMItems[this.current].classList.remove('active');
 		this.toggle(null);
+		this.unmountUI();
 	},
 	toggle(i){
 		this.isOpen = !this.isOpen;

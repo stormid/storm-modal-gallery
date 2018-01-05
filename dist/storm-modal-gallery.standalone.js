@@ -1,6 +1,6 @@
 /**
  * @name storm-modal-gallery: Modal gallery/lightbox
- * @version 1.2.1: Thu, 25 May 2017 16:22:59 GMT
+ * @version 1.2.1: Mon, 27 Nov 2017 20:27:03 GMT
  * @author mjbp
  * @license MIT
  */
@@ -70,9 +70,6 @@ var componentPrototype = {
 		this.isOpen = false;
 		this.current = false;
 		this.imageCache = [];
-		this.initUI();
-		this.initButtons();
-		this.focusableChildren = this.getFocusableChildren();
 		this.items[0].trigger && this.initTriggers();
 		this.settings.preload && this.items.forEach(function (item$$1, i) {
 			_this.loadImage(i);
@@ -93,15 +90,23 @@ var componentPrototype = {
 			});
 		});
 	},
-	initUI: function initUI() {
+	initUI: function initUI(i) {
+		var _this3 = this;
+
 		this.DOMOverlay = document.body.appendChild(overlay());
 		this.DOMOverlay.insertAdjacentHTML('beforeend', overlayInner(this.items.map(details).map(item).join('')));
 		this.DOMItems = [].slice.call(this.DOMOverlay.querySelectorAll('.js-modal-gallery__item'));
 		this.DOMTotals = this.DOMOverlay.querySelector('.js-gallery-totals');
+		if (this.imageCache.length === this.items.length) this.imageCache.forEach(function (img, i) {
+			_this3.writeImage(i);
+		});else this.loadImages(i);
 		return this;
 	},
+	unmountUI: function unmountUI() {
+		this.DOMOverlay.parentNode.removeChild(this.DOMOverlay);
+	},
 	initButtons: function initButtons() {
-		var _this3 = this;
+		var _this4 = this;
 
 		this.closeBtn = this.DOMOverlay.querySelector('.js-modal-gallery__close');
 		this.closeBtn.addEventListener('click', this.close.bind(this));
@@ -117,9 +122,9 @@ var componentPrototype = {
 
 		TRIGGER_EVENTS.forEach(function (ev) {
 			['previous', 'next'].forEach(function (type) {
-				_this3[type + 'Btn'].addEventListener(ev, function (e) {
+				_this4[type + 'Btn'].addEventListener(ev, function (e) {
 					if (e.keyCode && e.keyCode !== KEY_CODES.ENTER) return;
-					_this3[type]();
+					_this4[type]();
 				});
 			});
 		});
@@ -127,31 +132,33 @@ var componentPrototype = {
 	writeTotals: function writeTotals() {
 		this.DOMTotals.innerHTML = this.current + 1 + '/' + this.items.length;
 	},
+	writeImage: function writeImage(i) {
+		var imageContainer = this.DOMItems[i].querySelector('.js-modal-gallery__img-container'),
+		    imageClassName = this.settings.scrollable ? 'modal-gallery__img modal-gallery__img--scrollable' : 'modal-gallery__img',
+		    srcsetAttribute = this.items[i].srcset ? ' srcset="' + this.items[i].srcset + '"' : '',
+		    sizesAttribute = this.items[i].sizes ? ' sizes="' + this.items[i].sizes + '"' : '';
+
+		imageContainer.innerHTML = '<img class="' + imageClassName + '" src="' + this.items[i].src + '" alt="' + this.items[i].title + '"' + srcsetAttribute + sizesAttribute + '>';
+		this.DOMItems[i].classList.remove('loading');
+	},
 	loadImage: function loadImage(i) {
-		var _this4 = this;
+		var _this5 = this;
 
 		var img = new Image(),
-		    imageContainer = this.DOMItems[i].querySelector('.js-modal-gallery__img-container'),
-		    imageClassName = this.settings.scrollable ? 'modal-gallery__img modal-gallery__img--scrollable' : 'modal-gallery__img',
 		    loaded = function loaded() {
-			var srcsetAttribute = _this4.items[i].srcset ? ' srcset="' + _this4.items[i].srcset + '"' : '',
-			    sizesAttribute = _this4.items[i].sizes ? ' sizes="' + _this4.items[i].sizes + '"' : '';
-			imageContainer.innerHTML = '<img class="' + imageClassName + '" src="' + _this4.items[i].src + '" alt="' + _this4.items[i].title + '"' + srcsetAttribute + sizesAttribute + '>';
-			_this4.DOMItems[i].classList.remove('loading');
-			img.onload = null;
+			_this5.imageCache[i] = img;
+			_this5.writeImage(i);
 		};
 		img.onload = loaded;
 		img.src = this.items[i].src;
 		img.onerror = function () {
-			_this4.DOMItems[i].classList.remove('loading');
-			_this4.DOMItems[i].classList.add('error');
+			_this5.DOMItems[i].classList.remove('loading');
+			_this5.DOMItems[i].classList.add('error');
 		};
 		if (img.complete) loaded();
 	},
 	loadImages: function loadImages(i) {
-		var _this5 = this;
-
-		if (this.imageCache.length === this.items) return;
+		var _this6 = this;
 
 		var indexes = [i];
 
@@ -159,9 +166,9 @@ var componentPrototype = {
 		if (this.items.length > 2) indexes.push(i === this.items.length - 1 ? 0 : i + 1);
 
 		indexes.forEach(function (idx) {
-			if (_this5.imageCache[idx] === undefined) {
-				_this5.DOMItems[idx].classList.add('loading');
-				_this5.loadImage(idx);
+			if (_this6.imageCache[idx] === undefined) {
+				_this6.DOMItems[idx].classList.add('loading');
+				_this6.loadImage(idx);
 			}
 		});
 	},
@@ -211,22 +218,24 @@ var componentPrototype = {
 		this.items.length > 1 && this.settings.totals && this.writeTotals();
 	},
 	previous: function previous() {
-		var _this6 = this;
-
-		this.incrementDecrement(function () {
-			return _this6.current === 0 ? _this6.DOMItems.length - 1 : _this6.current - 1;
-		});
-	},
-	next: function next() {
 		var _this7 = this;
 
 		this.incrementDecrement(function () {
-			return _this7.current === _this7.DOMItems.length - 1 ? 0 : _this7.current + 1;
+			return _this7.current === 0 ? _this7.DOMItems.length - 1 : _this7.current - 1;
+		});
+	},
+	next: function next() {
+		var _this8 = this;
+
+		this.incrementDecrement(function () {
+			return _this8.current === _this8.DOMItems.length - 1 ? 0 : _this8.current + 1;
 		});
 	},
 	open: function open(i) {
+		this.initUI(i);
+		this.initButtons();
+		this.focusableChildren = this.getFocusableChildren();
 		document.addEventListener('keydown', this.keyListener.bind(this));
-		this.loadImages(i);
 		this.lastFocused = document.activeElement;
 		this.focusableChildren.length && window.setTimeout(function () {
 			this.focusableChildren[0].focus();
@@ -239,6 +248,7 @@ var componentPrototype = {
 		this.lastFocused && this.lastFocused.focus();
 		this.DOMItems[this.current].classList.remove('active');
 		this.toggle(null);
+		this.unmountUI();
 	},
 	toggle: function toggle(i) {
 		this.isOpen = !this.isOpen;

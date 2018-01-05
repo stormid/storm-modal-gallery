@@ -21,7 +21,7 @@ describe('DOM initialisation', () => {
 		ModalGalleryItem.should.have.property('current');
 		ModalGalleryItem.should.have.property('items').Array();
 		ModalGalleryItem.should.have.property('imageCache').Array();
-		ModalGalleryItem.should.have.property('focusableChildren').Array();
+		//ModalGalleryItem.should.have.property('focusableChildren').Array();
 		ModalGalleryItem.should.have.property('init').Function();
 		ModalGalleryItem.should.have.property('initTriggers').Function();
 		ModalGalleryItem.should.have.property('initUI').Function();
@@ -65,7 +65,7 @@ describe('Programmatic initialisation', () => {
 		Gallery.should.have.property('current');
 		Gallery.should.have.property('items').Array();
 		Gallery.should.have.property('imageCache').Array();
-		Gallery.should.have.property('focusableChildren').Array();
+		// Gallery.should.have.property('focusableChildren').Array();
 		Gallery.should.have.property('init').Function();
 		Gallery.should.have.property('initTriggers').Function();
 		Gallery.should.have.property('initUI').Function();
@@ -88,46 +88,40 @@ describe('Programmatic initialisation', () => {
 	});
 });
 
-/*
-describe('Initialisation', () => {
+describe('Keyboard interaction', () => {
 	
+	it('should attach keydown eventListener to each toggler', () => {
 
-	it('should initialisation with different settings if different options are passed', () => {
-		should(TogglersNoDelay[0].settings.delay).not.equal(Togglers[0].settings.delay);
+		//not a trigger
+		ModalGalleryItem.items[0].trigger.dispatchEvent(
+			new window.KeyboardEvent('keydown', { 
+				code : 33,
+				keyCode: 33
+			})
+		);
+
+		//trigger
+		ModalGalleryItem.items[0].trigger.dispatchEvent(
+			new window.KeyboardEvent('keydown', { 
+				code : 32,
+				keyCode: 32
+			})
+		);
+		
 	});
 
-	it('should attach the handleClick eventListener to DOMElement click event to toggle documentElement className', () => {
-		TogglersNoDelay[0].btn.click();
-		setTimeout(() => {
-			Array.from(document.documentElement.classList).should.containEql('on--target-3');
-			TogglersNoDelay[0].btn.click();
-			setTimeout(() => {
-				TogglersNoDelay.from(document.documentElement.classList).should.not.containEql('on--target-3');
-			}, 1000);
+	it('should trap tab when the modal is open', () => {
+
+		ModalGalleryItem.items[0].trigger.dispatchEvent(
+			new window.KeyboardEvent('keydown', { 
+				code : 32,
+				keyCode: 32
+			})
+		);
+
+		let tabDownEvt = new window.KeyboardEvent('keydown', {
+			key : 'Tab',
+			keyCode: 9
 		});
 	});
-
-	it('should attach the handleClick eventListener to DOMElement click event to toggle parentNode className', () => {
-		TogglersLocal[0].btn.click();
-		setTimeout(() => {
-			Array.from(TogglersLocal[0].btn.parentNode.classList).should.containEql('active');
-			TogglersLocal[0].btn.click();
-			setTimeout(() => {
-				TogglersLocal.from(TogglersLocal[0].btn.parentNode.classList).should.not.containEql('active');
-			}, 1000);
-		});
-	});
-	
-	it('should pass an invokable callback as an option', () => {
-		TogglersNoDelay[0].settings.should.have.property('callback').Function();
-	});
-
-	it('should change sibling buttons aria expanded attribute', () => {
-		Togglers[0].btn.click();
-		setTimeout(() => {
-			Togglers[0].siblingBtns[0].getAttribute('aria-expanded').should.equal(true);
-		});
-	});
-
 });
-*/
