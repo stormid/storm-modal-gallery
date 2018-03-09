@@ -1,13 +1,11 @@
 # Storm Modal Gallery 
 
-[![Build Status](https://travis-ci.org/mjbp/storm-modal-gallery.svg?branch=master)](https://travis-ci.org/mjbp/storm-modal-gallery)
-[![codecov.io](http://codecov.io/github/mjbp/storm-modal-gallery/coverage.svg?branch=master)](http://codecov.io/github/mjbp/storm-modal-gallery?branch=master)
 [![npm version](https://badge.fury.io/js/storm-modal-gallery.svg)](https://badge.fury.io/js/storm-modal-gallery)
 
 Modal gallery/lightbox.
 
 ## Example
-[https://mjbp.github.io/storm-modal-gallery](https://mjbp.github.io/storm-modal-gallery)
+[https://stormid.github.io/storm-modal-gallery](https://stormid.github.io/storm-modal-gallery)
 
 
 ## Usage
@@ -124,7 +122,7 @@ or aynchronous browser loading (use the .standalone version in the /dist folder)
 ```
 import Load from 'storm-load';
 
-Load('/content/js/async/storm-toggler.standalone.js')
+Load('/content/js/async/storm-modal-gallery.standalone.js')
     .then(() => {
         StormModalGalllery.init('.js-modal-gallery');
     });
@@ -180,7 +178,7 @@ npm run test
 ## Browser support
 This is module has both es6 and es5 distributions. The es6 version should be used in a workflow that transpiles.
 
-This module depends upon Object.assign, element.classList, and Promises, available in all evergreen browsers. ie9+ is supported with polyfills, ie8+ will work with even more polyfills for Array functions and eventListeners.
+This module depends upon Object.assign available in all evergreen browsers. ie9+ is supported with polyfills, ie8+ will work with even more polyfills for Array functions and eventListeners.
 
 
 ## Dependencies
