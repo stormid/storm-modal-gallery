@@ -12,7 +12,7 @@ const KEY_CODES = {
 		RIGHT: 39,
 		ENTER: 13
 	},
-	TRIGGER_EVENTS = [window.PointerEvent ? 'pointerdown' : 'ontouchstart' in window ? 'touchstart' : 'click', 'keydown' ];
+	TRIGGER_EVENTS = window.PointerEvent ? ['pointerdown', 'keydown'] : ['ontouchstart' in window ? 'touchstart' : 'click', 'keydown' ];
 
 export default {
 	init() {
@@ -27,7 +27,7 @@ export default {
 		this.items.forEach((item, i) => {
 			TRIGGER_EVENTS.forEach(ev => {
 				item.trigger.addEventListener(ev, e => {
-					if(e.keyCode && e.keyCode !== KEY_CODES.ENTER) return;
+					if((e.keyCode && e.keyCode !== KEY_CODES.ENTER) || (e.which && e.which === 3)) return;
 					e.preventDefault();
 					e.stopPropagation();
 					this.open(i);

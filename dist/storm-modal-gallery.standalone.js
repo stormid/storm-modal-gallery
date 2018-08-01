@@ -1,6 +1,6 @@
 /**
  * @name storm-modal-gallery: Modal gallery/lightbox
- * @version 1.3.3: Fri, 29 Jun 2018 12:26:47 GMT
+ * @version 1.3.4: Wed, 01 Aug 2018 14:33:48 GMT
  * @author mjbp
  * @license MIT
  */
@@ -61,7 +61,7 @@ var KEY_CODES = {
 	RIGHT: 39,
 	ENTER: 13
 };
-var TRIGGER_EVENTS = [window.PointerEvent ? 'pointerdown' : 'ontouchstart' in window ? 'touchstart' : 'click', 'keydown'];
+var TRIGGER_EVENTS = window.PointerEvent ? ['pointerdown', 'keydown'] : ['ontouchstart' in window ? 'touchstart' : 'click', 'keydown'];
 
 var componentPrototype = {
 	init: function init() {
@@ -82,7 +82,7 @@ var componentPrototype = {
 		this.items.forEach(function (item$$1, i) {
 			TRIGGER_EVENTS.forEach(function (ev) {
 				item$$1.trigger.addEventListener(ev, function (e) {
-					if (e.keyCode && e.keyCode !== KEY_CODES.ENTER) return;
+					if (e.keyCode && e.keyCode !== KEY_CODES.ENTER || e.which && e.which === 3) return;
 					e.preventDefault();
 					e.stopPropagation();
 					_this2.open(i);
