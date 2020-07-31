@@ -37,7 +37,7 @@ export default {
 	},
 	initUI(i){
 		this.DOMOverlay = document.body.appendChild(overlay());
-		this.DOMOverlay.insertAdjacentHTML('beforeend', overlayInner(this.items.map(details).map(item).join('')));
+		this.DOMOverlay.insertAdjacentHTML('beforeend', overlayInner(this.items.map(details).map(item(this.items)).join('')));
 		this.DOMItems = [].slice.call(this.DOMOverlay.querySelectorAll('.js-modal-gallery__item'));
 		this.DOMTotals = this.DOMOverlay.querySelector('.js-gallery-totals');
 		if(this.imageCache.length === this.items.length) this.imageCache.forEach((img, i) => { this.writeImage(i); });
