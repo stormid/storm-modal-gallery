@@ -1,6 +1,6 @@
 /**
  * @name storm-modal-gallery: Modal gallery/lightbox
- * @version 1.3.5: Wed, 01 Jul 2020 16:16:00 GMT
+ * @version 1.5.0: Mon, 03 Aug 2020 12:44:54 GMT
  * @author mjbp
  * @license MIT
  */
@@ -43,11 +43,13 @@ var overlay = function overlay() {
 };
 
 var overlayInner = function overlayInner(items) {
-	return '<div class="modal-gallery__inner js-modal-gallery__inner">\n                                    <div class="modal-gallery__content js-modal-gallery__content">\n                                        ' + items + '\n                                    </div>\n                                </div>\n                                <button class="js-modal-gallery__next modal-gallery__next" aria-label="Next">\n                                    <svg focusable="false" aria-hidden="true" width="44" height="60">\n                                        <polyline points="14 10 34 30 14 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>\n                                    </svg>\n                                </button>\n                                <button class="js-modal-gallery__previous modal-gallery__previous" aria-label="Previous">\n                                    <svg focusable="false" aria-hidden="true" width="44" height="60">\n                                        <polyline points="30 10 10 30 30 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>\n                                    </svg>\n                                </button>\n                                <button class="js-modal-gallery__close modal-gallery__close" aria-label="Close">\n                                    <svg focusable="false" aria-hidden="true" width="30" height="30">\n                                        <g stroke="rgb(255,255,255)" stroke-width="4">\n                                            <line x1="5" y1="5" x2="25" y2="25"/>\n                                            <line x1="5" y1="25" x2="25" y2="5"/>\n                                        </g>\n                                    </svg>\n                                </button>\n                                <div class="modal-gallery__total js-gallery-totals"></div>';
+	return '<div class="modal-gallery__inner js-modal-gallery__inner" role="group" aria-roledescription="carousel">\n                                    <button class="js-modal-gallery__previous modal-gallery__previous" aria-label="Previous">\n                                        <svg focusable="false" aria-hidden="true" width="44" height="60">\n                                            <polyline points="30 10 10 30 30 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>\n                                        </svg>\n                                    </button>\n                                    <button class="js-modal-gallery__next modal-gallery__next" aria-label="Next">\n                                        <svg focusable="false" aria-hidden="true" width="44" height="60">\n                                            <polyline points="14 10 34 30 14 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>\n                                        </svg>\n                                    </button>\n                                    <button class="js-modal-gallery__close modal-gallery__close" aria-label="Close">\n                                        <svg focusable="false" aria-hidden="true" width="30" height="30">\n                                            <g stroke="rgb(255,255,255)" stroke-width="4">\n                                                <line x1="5" y1="5" x2="25" y2="25"/>\n                                                <line x1="5" y1="25" x2="25" y2="5"/>\n                                            </g>\n                                        </svg>\n                                    </button>\n                                    <div class="modal-gallery__content js-modal-gallery__content" aria-atomic="false" aria-live="polite">\n                                        ' + items + '\n                                    </div>\n                                </div>\n                                <div class="modal-gallery__total js-gallery-totals"></div>';
 };
 
-var item = function item(details) {
-	return '<div class="modal-gallery__item js-modal-gallery__item">\n                                    <div class="modal-gallery__img-container js-modal-gallery__img-container"></div>\n                                    ' + details + '\n                                </div>';
+var item = function item(items) {
+	return function (details, i) {
+		return '<div class="modal-gallery__item js-modal-gallery__item" role="group" aria-roledescription="slide" aria-label="Image ' + (i + 1) + ' of ' + items.length + (items[i].title ? ', ' + items[i].title : '') + '">\n                                    <div class="modal-gallery__img-container js-modal-gallery__img-container"></div>\n                                    ' + details + '\n                                </div>';
+	};
 };
 
 var details = function details(item) {
@@ -94,7 +96,7 @@ var componentPrototype = {
 		var _this3 = this;
 
 		this.DOMOverlay = document.body.appendChild(overlay());
-		this.DOMOverlay.insertAdjacentHTML('beforeend', overlayInner(this.items.map(details).map(item).join('')));
+		this.DOMOverlay.insertAdjacentHTML('beforeend', overlayInner(this.items.map(details).map(item(this.items)).join('')));
 		this.DOMItems = [].slice.call(this.DOMOverlay.querySelectorAll('.js-modal-gallery__item'));
 		this.DOMTotals = this.DOMOverlay.querySelector('.js-gallery-totals');
 		if (this.imageCache.length === this.items.length) this.imageCache.forEach(function (img, i) {
