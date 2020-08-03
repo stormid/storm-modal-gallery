@@ -10,14 +10,14 @@ export const overlay = () => {
 };
 
 export const overlayInner = items => `<div class="modal-gallery__inner js-modal-gallery__inner" role="group" aria-roledescription="carousel">
-                                    <button class="js-modal-gallery__next modal-gallery__next" aria-label="Next">
-                                        <svg focusable="false" aria-hidden="true" width="44" height="60">
-                                            <polyline points="14 10 34 30 14 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>
-                                        </svg>
-                                    </button>
                                     <button class="js-modal-gallery__previous modal-gallery__previous" aria-label="Previous">
                                         <svg focusable="false" aria-hidden="true" width="44" height="60">
                                             <polyline points="30 10 10 30 30 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>
+                                        </svg>
+                                    </button>
+                                    <button class="js-modal-gallery__next modal-gallery__next" aria-label="Next">
+                                        <svg focusable="false" aria-hidden="true" width="44" height="60">
+                                            <polyline points="14 10 34 30 14 50" stroke="rgb(255,255,255)" stroke-width="4" stroke-linecap="butt" fill="none" stroke-linejoin="round"/>
                                         </svg>
                                     </button>
                                     <button class="js-modal-gallery__close modal-gallery__close" aria-label="Close">
@@ -34,7 +34,7 @@ export const overlayInner = items => `<div class="modal-gallery__inner js-modal-
                                 </div>
                                 <div class="modal-gallery__total js-gallery-totals"></div>`;
 
-export const item = items => (details, i) => `<div class="modal-gallery__item js-modal-gallery__item" role="group" aria-roledescription="slide"${items[i].title ? ` aria-label="${items[i].title}"` : ''}>
+export const item = items => (details, i) => `<div class="modal-gallery__item js-modal-gallery__item" role="group" aria-roledescription="slide" aria-label="Image ${i + 1} of ${items.length}${items[i].title ? `, ${items[i].title}` : ''}">
                                     <div class="modal-gallery__img-container js-modal-gallery__img-container"></div>
                                     ${details}
                                 </div>`;
