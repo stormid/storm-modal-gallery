@@ -58,7 +58,7 @@
     "gulp-uglify": "^2.0.0",
     "gulp-wrap-umd": "^0.2.1",
     "istanbul": "^1.1.0-alpha.1",
-    "jsdom": "^9.8.0",
+    "jsdom": "^22.1.0",
     "jsdom-global": "^2.1.0",
     "mocha": "^5.2.0",
     "object-assign": "^4.0.1",
